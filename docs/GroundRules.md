@@ -32,6 +32,16 @@
 - **Documentation**: Document all API endpoints and functionality
 - **Git**: Use conventional commit messages and proper branching
 
+### Development Workflow
+- **Feature Branches**: Create a new feature branch for each piece of work (e.g., `feature/add-user-endpoints`)
+- **Pull Request Process**: All changes must go through pull requests for review
+  - Agent will create feature branches automatically
+  - Agent will provide comprehensive PR descriptions when work is complete
+  - Agent can create PRs directly on GitHub (with provided access token)
+  - Project lead reviews and approves PRs
+- **Branch Protection**: Main branch is protected and requires PR approval
+- **Commit Standards**: Follow conventional commit format (feat:, fix:, docs:, etc.)
+
 ### Migration Strategy
 - **Database Schema**: Direct migration from existing PostgreSQL setup
 - **API Endpoints**: Port existing Next.js API routes to Fastify routes
