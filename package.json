@@ -1,0 +1,43 @@
+{
+  "name": "task-blaster",
+  "version": "0.1.0",
+  "description": "A Kanban style orchestration app intended to coordinate AI agents with users executing on a project.",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push",
+    "db:seed": "node scripts/seed-all.js",
+    "db:reset": "node scripts/reset-and-seed.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelwitz/task-blaster.git"
+  },
+  "keywords": [
+    "agentic",
+    "kanban"
+  ],
+  "author": "Michael Woytowitz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/michaelwitz/task-blaster/issues"
+  },
+  "homepage": "https://github.com/michaelwitz/task-blaster#readme",
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/swagger": "^9.5.1",
+    "@fastify/swagger-ui": "^5.2.3",
+    "drizzle-kit": "^0.31.4",
+    "drizzle-orm": "^0.44.4",
+    "fastify": "^5.4.0",
+    "pino": "^9.7.0",
+    "postgres": "^3.4.7",
+    "zod": "^4.0.14"
+  }
+}
