@@ -99,6 +99,18 @@
   - Switch to main branch: `git checkout main`
   - Pull latest changes: `git pull origin main`
   - This is critical when multiple agents or developers are working on the same repository
+
+### Commit and PR Guidelines
+
+- **Primary Authentication Method**: Use GitHub Personal Access Token (PAT) stored in environment variable `GH_TOKEN`
+- **Token Setup Process**:
+  1. Create GitHub PAT with `repo`, `workflow`, and `write:packages` scopes
+  2. Add to `~/.zshrc`: `export GH_TOKEN=your_token_here`
+  3. Reload environment: `source ~/.zshrc`
+  4. Verify authentication: `gh auth status`
+  5. **Avoid Keychain Conflicts**: Do not store credentials in macOS keychain
+  6. Use the token directly in git commands if keychain issues arise:
+     - Temporary auth format: `git remote set-url origin https://$GH_TOKEN@github.com/owner/repo.git \&\& git push origin BRANCH \&\& git remote set-url origin https://github.com/owner/repo.git`
 - **Feature Branches**: Create a new feature branch for each piece of work (e.g., `feature/add-user-endpoints`)
 - **Pull Request Process**: All changes must go through pull requests for review
   - Agent will create feature branches automatically
@@ -122,14 +134,22 @@
 - **Recommended Workflow**:
   - Use GitHub CLI for all GitHub operations: `gh pr create`, `gh repo sync`, etc.
   - GitHub CLI automatically uses `GH_TOKEN` for authentication
-  - Avoid storing credentials in macOS keychain to prevent conflicts
-- **Git Push Authentication** (when keychain conflicts occur):
-  - Backup method: `git remote set-url origin https://$GH_TOKEN@github.com/owner/repo.git && git push origin BRANCH && git remote set-url origin https://github.com/owner/repo.git`
+  - **CRITICAL**: Avoid storing credentials in macOS keychain to prevent conflicts
+  - **Always use the environment token** instead of keychain authentication
+- **Git Push Authentication** (mandatory when keychain conflicts occur):
+  - **Primary method**: `git remote set-url origin https://$GH_TOKEN@github.com/owner/repo.git \&\& git push origin BRANCH \&\& git remote set-url origin https://github.com/owner/repo.git`
   - This temporarily embeds token, pushes, then resets to standard format
+  - **This is the preferred approach** to avoid any keychain authentication prompts
+- **Standard Commit and PR Process**:
+  1. Create feature branch: `git checkout -b feature/your-feature-name`
+  2. Make changes and commit: `git add -A \&\& git commit -m "feat: your commit message"`
+  3. Push using token method: `git remote set-url origin https://$GH_TOKEN@github.com/owner/repo.git \&\& git push origin feature/your-feature-name \&\& git remote set-url origin https://github.com/owner/repo.git`
+  4. Create PR: `gh pr create --title "Your PR title" --body "Your PR description"`
 - **Troubleshooting**:
   - Clear keychain conflicts: Remove any github.com entries from Keychain Access
   - Verify token in environment: `echo $GH_TOKEN`
   - Test GitHub CLI: `gh auth status`
+  - **Never** rely on keychain for authentication - always use the token
 
 ### Migration Strategy
 
