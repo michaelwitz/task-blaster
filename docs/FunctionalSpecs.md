@@ -20,8 +20,40 @@ The following functional specifications are intended to outline all key requirem
    - Responsive Design: Adaptable UI for various screen sizes
    - Dark/Light Theme: User-selectable themes for better experience
    - Keyboard Navigation: Full keyboard accessibility
+
+4. **Image Management System**
+   - **Multiple Attachments**: Each task can have multiple image attachments
+   - **File Type Support**: Standard image formats (JPEG, PNG, GIF, WebP, SVG)
+   - **Storage Strategy**: Environment-dependent storage approach
+     - **Development**: Images stored as base64 data in PostgreSQL database tables
+     - **Production**: Images stored in cloud storage (AWS S3, Google Cloud Storage, etc.)
+   - **Metadata Tracking**: Original filename, content type, file size, and timestamps
+   - **Thumbnail Generation**: Automatic thumbnail creation for preview purposes
+   - **Storage Flexibility**: `storage_type` field supports seamless migration from local to cloud storage
+   - **Access Control**: Images inherit task access permissions
    
-4. **Development & Testing**
+5. **Tag System**
+   - Task Categorization: Tags provide metadata and additional context for tasks
+   - Tag Format: Tags must be lowercase with only hyphens (-) as separators
+   - Tag Validation: Tags cannot start or end with a hyphen
+   - Examples: "bug", "ux", "api", "testing", "reactjs-client", "user-management"
+   - Cross-Project Consistency: Tags persist beyond task deletion to maintain consistency across projects
+   - Tag Reusability: Same tags can be used across multiple projects and tasks
+   - API-First Validation: Tag naming rules are strictly enforced at the API level for all clients
+   - Agent Communication: Future AI agents will communicate via API, requiring robust server-side validation
+   - Dual-Layer Enforcement: Frontend provides user experience validation, API ensures data integrity
+   - Error Responses: API returns descriptive validation errors for invalid tag formats
+
+6. **Data Formatting Standards**
+   - **Keyword Values**: All keyword/enum values (status, priority, etc.) must use ENUM_CASE format
+   - **Status Values**: "TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE" 
+   - **Priority Values**: "LOW", "MEDIUM", "HIGH", "CRITICAL"
+   - **Tags**: Exception to ENUM_CASE - tags use lowercase-with-hyphens format (e.g., "user-management")
+   - **Consistency**: All seed data, validation schemas, and API responses must follow these standards
+   - **Database Storage**: Keywords stored as ENUM_CASE values in database for consistency
+   - **API Validation**: Server-side validation enforces proper keyword formats
+   
+7. **Development & Testing**
    - Comprehensive API documentation and testing coverage
    - Proper error handling and user feedback
 
