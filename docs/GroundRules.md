@@ -33,6 +33,11 @@
 - **Git**: Use conventional commit messages and proper branching
 
 ### Development Workflow
+- **Git Synchronization**: Before starting any new work, always check git status and sync with main
+  - Run `git status` to check current branch and state
+  - Switch to main branch: `git checkout main`
+  - Pull latest changes: `git pull origin main`
+  - This is critical when multiple agents or developers are working on the same repository
 - **Feature Branches**: Create a new feature branch for each piece of work (e.g., `feature/add-user-endpoints`)
 - **Pull Request Process**: All changes must go through pull requests for review
   - Agent will create feature branches automatically
