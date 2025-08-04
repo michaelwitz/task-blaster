@@ -1,15 +1,28 @@
 import Fastify from 'fastify';
-import pino from 'pino';
+import { randomUUID } from 'crypto';
 
-// Create Fastify instance with Pino logger
+// Create Fastify instance with built-in Pino logger
 const app = Fastify({
-  logger: pino({
+  logger: {
     level: process.env.LOG_LEVEL || 'info',
-  }),
+  },
+});
+
+// Add correlation ID hook
+app.addHook('onRequest', async (request, reply) => {
+  request.correlationId = request.headers['x-correlation-id'] || randomUUID();
+  request.log = request.log.child({ correlationId: request.correlationId });
+});
+
+// Add correlation ID to response headers
+app.addHook('onSend', async (request, reply, payload) => {
+  reply.header('x-correlation-id', request.correlationId);
+  return payload;
 });
 
 // Register routes
-app.register(import('./routes'));
+import routes from './routes/index.js';
+app.register(routes);
 
 // Start server
 const start = async () => {

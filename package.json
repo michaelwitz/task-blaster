@@ -31,13 +31,14 @@
   "homepage": "https://github.com/michaelwitz/task-blaster#readme",
   "dependencies": {
     "@fastify/cors": "^11.1.0",
+    "@fastify/multipart": "^9.0.3",
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",
     "fastify": "^5.4.0",
+    "fastify-plugin": "^5.0.1",
     "pino": "^9.7.0",
-    "postgres": "^3.4.7",
-    "zod": "^4.0.14"
+    "postgres": "^3.4.7"
   }
 }

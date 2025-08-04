@@ -1,37 +1,191 @@
 # Implementation Plan - Task Blaster
 
-This document provides a detailed implementation plan for transitioning the functionality of Task Blaster from the existing Next.js/TypeScript/Drizzle setup to a JavaScript/Fastify/Drizzle stack.
+This document provides a detailed implementation plan for transitioning the functionality of Task Blaster from the existing Next.js/TypeScript/Drizzle setup to a JavaScript/Fastify/Drizzle stack with comprehensive API functionality.
 
-## Steps Overview
+## Phase 1: Documentation & Foundation
 
-1. **Create Documentation
-   - Create `GroundRules.md` in the `docs` directory
-   - Create `FunctionalSpecs.md` in the `docs` directory
+### 1.1 Documentation Setup ✅
+   - Create `GroundRules.md` with technology stack and best practices
+   - Create `FunctionalSpecs.md` with detailed requirements
+   - Update `ImplementationPlan.md` with comprehensive approach
+   - Document database naming conventions (snake_case ↔ camelCase)
+   - Document Fastify best practices for routes, middleware, and logging
 
-2. **Set Up Project**
-   - Project has been initialized with Git (pre-configured)
-   - Run `npm init` in the project root (developer can execute this step)
+### 1.2 Project Initialization ✅
+   - Project initialized with Git (pre-configured)
+   - Basic project structure established
 
-3. **Back-End Setup**
-   - Install Fastify: `npm install fastify`
-   - Configure server to run on port 3030
-   - Implement structured logging using Pino
+## Phase 2: Core Infrastructure
 
-4. **Front-End Setup**
-   - Set up React for the client at port 3001
-   - Use existing components and convert them from TypeScript to JavaScript/JSX
+### 2.1 Utility Layer
+   - **Property Mapper**: Implement snake_case ↔ camelCase conversion utility
+     - Support single objects and arrays
+     - Handle nested objects and complex data structures
+     - Provide mapping functions for API layer
+   
+   - **Database Service Layer**: Port comprehensive DatabaseService from Next.js
+     - User management (get, search, create, update)
+     - Project management with leader relationships
+     - Task management with assignees, tags, and positioning
+     - Tag management and search functionality
+     - Image handling for projects and tasks
 
-5. **Database Configuration**
-   - Use existing PostgreSQL schema and Drizzle ORM
-   - Configure Docker Compose to run on a new port avoiding 5432
+### 2.2 Fastify Server Setup
+   - **Core Server Configuration**:
+     - Install Fastify with Pino logging
+     - Configure server on port 3030
+     - Set up CORS for cross-origin requests
+     - Implement global error handling
+   
+   - **Plugin Architecture**:
+     - Create plugin system for modular route organization
+     - Implement API versioning with `/api/v1` prefix
+     - Set up response transformation hooks (snake_case → camelCase)
 
-6. **API Development**
-   - Migrate existing Next.js API routes to Fastify
-   - Maintain full test coverage for existing API endpoints
+## Phase 3: API Implementation
 
-7. **Testing and Validation**
-   - Run and validate all existing API tests
-   - Ensure documentation is updated to reflect new setup
+### 3.1 Core API Routes
+   - **Health & System Routes**:
+     - `GET /health` - Health check endpoint
+     - `GET /` - API information and version
+     - `GET /api/v1/db-test` - Database connection test
+
+### 3.2 User Management API
+   - **User Routes** (`/api/v1/users`):
+     - `GET /users` - List all users with search capability
+     - `GET /users/:id` - Get specific user by ID
+     - `POST /users` - Create new user
+     - `PUT /users/:id` - Update user
+     - `DELETE /users/:id` - Delete user
+     - `GET /users/search?q=term` - Search users by name/email
+
+### 3.3 Project Management API
+   - **Project Routes** (`/api/v1/projects`):
+     - `GET /projects` - List projects with leader info and task counts
+     - `GET /projects/:id` - Get specific project with full details
+     - `POST /projects` - Create new project
+     - `PUT /projects/:id` - Update project
+     - `DELETE /projects/:id` - Delete project
+     - `GET /projects/:id/tasks` - Get tasks for specific project
+     - `POST /projects/:id/image` - Upload project image
+     - `DELETE /projects/:id/image` - Remove project image
+
+### 3.4 Task Management API
+   - **Task Routes** (`/api/v1/tasks`):
+     - `GET /tasks` - List all tasks with filters
+     - `GET /tasks/:id` - Get specific task with assignees and tags
+     - `POST /tasks` - Create new task with proper positioning
+     - `PUT /tasks/:id` - Update task
+     - `DELETE /tasks/:id` - Delete task
+     - `PATCH /tasks/:id/reorder` - Reorder task position
+     - `GET /tasks/search?q=term` - Search tasks
+
+### 3.5 Tag Management API
+   - **Tag Routes** (`/api/v1/tags`):
+     - `GET /tags` - List all tags with usage counts
+     - `GET /tags/:id` - Get specific tag
+     - `POST /tags` - Create new tag
+     - `PUT /tags/:id` - Update tag
+     - `DELETE /tags/:id` - Delete tag (with cascade handling)
+     - `GET /tags/search?q=term` - Search tags
+
+### 3.6 Image Management API ✅
+   - **Task Image Routes**:
+     - `GET /tasks/:taskId/images` - List all images for a task
+     - `POST /tasks/:taskId/images/upload` - Upload multiple images to a task
+     - `DELETE /tasks/:taskId/images/:imageId` - Delete specific image from task (secure)
+   
+   - **Image Serving Routes**:
+     - `GET /images/:id` - Serve individual image with proper caching headers
+     - `GET /images/:id/metadata` - Get image metadata without binary data
+   
+   - **Security Features**:
+     - Task ownership validation prevents cross-task image deletion
+     - Returns 403 Forbidden for unauthorized access attempts
+     - Correlation ID logging for security auditing
+   
+   - **Storage Strategy**:
+     - **Development**: Images stored as base64 in PostgreSQL `IMAGE_DATA` table
+     - **Production**: Designed for migration to cloud storage (S3, GCS, etc.)
+     - `storage_type` field supports seamless environment transitions
+   
+   - **Client-Side Strategy**:
+     - Client fetches image list (`GET /tasks/:taskId/images`) for metadata
+     - Async thumbnail loading: Client requests each image individually
+     - Lazy loading pattern: `GET /images/:id` called per image as needed
+     - Caching headers ensure efficient browser/CDN caching
+   
+   - **Performance Optimizations**:
+     - 1-year cache headers for image serving
+     - Base64 to binary conversion on-demand
+     - Thumbnail data support for future implementation
+
+## Phase 4: Advanced Features
+
+### 4.1 Schema Validation
+   - **Request/Response Schemas**:
+     - Use Fastify's built-in AJV (JSON Schema) validation for maximum performance
+     - Define JSON schemas for all endpoints with proper validation rules
+     - Implement dual-layer validation: API-level (AJV) + Database-level (custom functions)
+     - Create consistent error response formats with detailed validation messages
+     - Add input sanitization and validation for all user inputs
+     - Special focus on tag name validation (lowercase, hyphen rules) at API level
+     - Leverage Fastify's automatic schema compilation for optimal request processing
+
+### 4.2 Authentication & Authorization
+   - **Security Layer**:
+     - Implement `preHandler` hooks for auth
+     - Add request correlation IDs
+     - Set up structured logging with user context
+
+### 4.3 Performance & Optimization
+   - **Caching & Performance**:
+     - Implement response caching where appropriate
+     - Add query optimization for complex operations
+     - Set up request/response compression
+
+## Phase 5: Database Integration
+
+### 5.1 Database Configuration
+   - **PostgreSQL Setup**:
+     - Reuse existing schema and Drizzle ORM configuration
+     - Configure Docker Compose on alternative port
+     - Ensure proper connection pooling
+
+### 5.2 Migration Strategy
+   - **Data Layer**:
+     - Port existing database models
+     - Maintain existing relationships and constraints
+     - Ensure data integrity during transition
+
+## Phase 6: Testing & Validation
+
+### 6.1 API Testing
+   - **Comprehensive Test Suite**:
+     - Port existing API tests to new Fastify endpoints
+     - Test all CRUD operations
+     - Validate snake_case ↔ camelCase conversion
+     - Test error handling and edge cases
+
+### 6.2 Integration Testing
+   - **End-to-End Validation**:
+     - Test complete workflows (user → project → task)
+     - Validate file upload functionality
+     - Test search and filtering capabilities
+
+## Phase 7: Documentation & Deployment
+
+### 7.1 API Documentation
+   - **Documentation Updates**:
+     - Update API test commands documentation
+     - Document all new endpoints with examples
+     - Create migration guide from Next.js to Fastify
+
+### 7.2 Deployment Preparation
+   - **Production Readiness**:
+     - Configure environment-specific settings
+     - Set up health monitoring
+     - Prepare Docker configurations
 
 ## Review Process
 
