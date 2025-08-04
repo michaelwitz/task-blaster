@@ -33,6 +33,11 @@
 - **Git**: Use conventional commit messages and proper branching
 
 ### Development Workflow
+- **Git Synchronization**: Before starting any new work, always check git status and sync with main
+  - Run `git status` to check current branch and state
+  - Switch to main branch: `git checkout main`
+  - Pull latest changes: `git pull origin main`
+  - This is critical when multiple agents or developers are working on the same repository
 - **Feature Branches**: Create a new feature branch for each piece of work (e.g., `feature/add-user-endpoints`)
 - **Pull Request Process**: All changes must go through pull requests for review
   - Agent will create feature branches automatically
@@ -41,6 +46,28 @@
   - Project lead reviews and approves PRs
 - **Branch Protection**: Main branch is protected and requires PR approval
 - **Commit Standards**: Follow conventional commit format (feat:, fix:, docs:, etc.)
+
+### GitHub Integration Setup
+- **Primary Authentication Method**: Use GitHub Personal Access Token (PAT) stored in environment variable `GH_TOKEN`
+- **Token Setup Process**:
+  1. Create GitHub PAT with `repo`, `workflow`, and `write:packages` scopes
+  2. Add to `~/.zshrc`: `export GH_TOKEN=your_token_here`
+  3. Reload environment: `source ~/.zshrc`
+  4. Verify authentication: `gh auth status`
+- **Git Repository Configuration**:
+  - Keep standard remote format: `https://github.com/owner/repo.git`
+  - Verify with: `git remote get-url origin`
+- **Recommended Workflow**:
+  - Use GitHub CLI for all GitHub operations: `gh pr create`, `gh repo sync`, etc.
+  - GitHub CLI automatically uses `GH_TOKEN` for authentication
+  - Avoid storing credentials in macOS keychain to prevent conflicts
+- **Git Push Authentication** (when keychain conflicts occur):
+  - Backup method: `git remote set-url origin https://$GH_TOKEN@github.com/owner/repo.git && git push origin BRANCH && git remote set-url origin https://github.com/owner/repo.git`
+  - This temporarily embeds token, pushes, then resets to standard format
+- **Troubleshooting**:
+  - Clear keychain conflicts: Remove any github.com entries from Keychain Access
+  - Verify token in environment: `echo $GH_TOKEN`
+  - Test GitHub CLI: `gh auth status`
 
 ### Migration Strategy
 - **Database Schema**: Direct migration from existing PostgreSQL setup
