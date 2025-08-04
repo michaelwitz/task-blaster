@@ -48,24 +48,26 @@
 - **Commit Standards**: Follow conventional commit format (feat:, fix:, docs:, etc.)
 
 ### GitHub Integration Setup
-- **Access Token**: GitHub Personal Access Token (PAT) is stored in environment variable `GH_TOKEN`
-- **Token Permissions**: Classic PAT requires `repo`, `workflow`, and `write:packages` scopes
-- **Persistent Storage**: Token is stored in `~/.zshrc` for persistence across terminal sessions
-  - Add line: `export GH_TOKEN=your_token_here`
-  - Reload with: `source ~/.zshrc`
-- **Git Authentication Process**: Handle macOS keychain conflicts with reliable push method
-  - Standard remote format: `https://github.com/owner/repo.git`
-  - For reliable push: Temporarily embed token in URL, push, then reset
-  - Command: `git remote set-url origin https://TOKEN@github.com/owner/repo.git && git push origin BRANCH && git remote set-url origin https://github.com/owner/repo.git`
-  - This avoids keychain conflicts and ensures consistent authentication
-- **GitHub CLI**: Uses `gh` command for PR creation and repository operations
-  - GitHub CLI handles authentication automatically via `GH_TOKEN`
-  - Use GitHub CLI for PR creation: `gh pr create --base main --head BRANCH --title "Title" --body "Description"`
-- **Authentication Verification**: Run `gh auth status` to verify token is working
-- **Repository Access**: Agent can create PRs, push branches, and manage repository via GitHub API
-- **Credential Management**: Clear conflicting keychain entries if needed
-  - Reset credential helper: `git config --global credential.helper store`
-  - Remove old credentials: Clear keychain entries for github.com
+- **Primary Authentication Method**: Use GitHub Personal Access Token (PAT) stored in environment variable `GH_TOKEN`
+- **Token Setup Process**:
+  1. Create GitHub PAT with `repo`, `workflow`, and `write:packages` scopes
+  2. Add to `~/.zshrc`: `export GH_TOKEN=your_token_here`
+  3. Reload environment: `source ~/.zshrc`
+  4. Verify authentication: `gh auth status`
+- **Git Repository Configuration**:
+  - Keep standard remote format: `https://github.com/owner/repo.git`
+  - Verify with: `git remote get-url origin`
+- **Recommended Workflow**:
+  - Use GitHub CLI for all GitHub operations: `gh pr create`, `gh repo sync`, etc.
+  - GitHub CLI automatically uses `GH_TOKEN` for authentication
+  - Avoid storing credentials in macOS keychain to prevent conflicts
+- **Git Push Authentication** (when keychain conflicts occur):
+  - Backup method: `git remote set-url origin https://$GH_TOKEN@github.com/owner/repo.git && git push origin BRANCH && git remote set-url origin https://github.com/owner/repo.git`
+  - This temporarily embeds token, pushes, then resets to standard format
+- **Troubleshooting**:
+  - Clear keychain conflicts: Remove any github.com entries from Keychain Access
+  - Verify token in environment: `echo $GH_TOKEN`
+  - Test GitHub CLI: `gh auth status`
 
 ### Migration Strategy
 - **Database Schema**: Direct migration from existing PostgreSQL setup
