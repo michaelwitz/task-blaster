@@ -47,6 +47,16 @@
 - **Branch Protection**: Main branch is protected and requires PR approval
 - **Commit Standards**: Follow conventional commit format (feat:, fix:, docs:, etc.)
 
+### GitHub Integration Setup
+- **Access Token**: GitHub Personal Access Token (PAT) is stored in environment variable `GH_TOKEN`
+- **Token Permissions**: Classic PAT requires `repo`, `workflow`, and `write:packages` scopes
+- **Persistent Storage**: Token is stored in `~/.zshrc` for persistence across terminal sessions
+  - Add line: `export GH_TOKEN=your_token_here`
+  - Reload with: `source ~/.zshrc`
+- **GitHub CLI**: Uses `gh` command for PR creation and repository operations
+- **Authentication Verification**: Run `gh auth status` to verify token is working
+- **Repository Access**: Agent can create PRs, push branches, and manage repository via GitHub API
+
 ### Migration Strategy
 - **Database Schema**: Direct migration from existing PostgreSQL setup
 - **API Endpoints**: Port existing Next.js API routes to Fastify routes
