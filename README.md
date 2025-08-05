@@ -1,6 +1,12 @@
 # Task Blaster - Kanban Orchestration App
 
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![Node.js](https://img.shields.io/badge/Node.js-22%2B-green.svg)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+
 A modern Kanban-style task management application built as a monorepo with a Fastify API backend and React TypeScript frontend.
+
+> ✅ **Status**: Fully tested and working - API, database, and Docker setup confirmed operational.
 
 ## 🏗️ Architecture
 
