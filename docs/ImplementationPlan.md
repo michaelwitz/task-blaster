@@ -15,7 +15,18 @@ This document provides a detailed implementation plan for transitioning the func
    - Project initialized with Git (pre-configured)
    - Basic project structure established
 
-### 1.3 Monorepo Architecture ✅
+### 1.3 .gitignore and Environment Setup ✅
+   - **Gitignore Configuration**:
+     - Root, API, and Client `.gitignore` files configured to exclude:
+       - `node_modules/`
+       - `dist/` and `dist-ssr/`
+       - `*.log` and other debug files
+       - Editor-specific directories (`.vscode/`, `.idea/`)
+   - **Environment Variables**:
+     - `.env` files are untracked and used for local development secrets.
+     - `.env.example` is tracked as a template for other developers.
+
+### 1.4 Monorepo Architecture ✅
    - **Workspace Structure**:
      - Root package.json with npm workspaces configuration
      - `api/` - Fastify server (JavaScript ES modules)
@@ -210,56 +221,56 @@ This document provides a detailed implementation plan for transitioning the func
      - Special focus on tag name validation (lowercase, hyphen rules) at API level
      - Leverage Fastify's automatic schema compilation for optimal request processing
 
-### 4.2 Authentication & Authorization
+### 5.2 Authentication & Authorization
    - **Security Layer**:
      - Implement `preHandler` hooks for auth
      - Add request correlation IDs
      - Set up structured logging with user context
 
-### 4.3 Performance & Optimization
+### 5.3 Performance & Optimization
    - **Caching & Performance**:
      - Implement response caching where appropriate
      - Add query optimization for complex operations
      - Set up request/response compression
 
-## Phase 5: Database Integration
+## Phase 6: Database Integration
 
-### 5.1 Database Configuration
+### 6.1 Database Configuration
    - **PostgreSQL Setup**:
      - Reuse existing schema and Drizzle ORM configuration
      - Configure Docker Compose on alternative port
      - Ensure proper connection pooling
 
-### 5.2 Migration Strategy
+### 6.2 Migration Strategy
    - **Data Layer**:
      - Port existing database models
      - Maintain existing relationships and constraints
      - Ensure data integrity during transition
 
-## Phase 6: Testing & Validation
+## Phase 7: Testing & Validation
 
-### 6.1 API Testing
+### 7.1 API Testing
    - **Comprehensive Test Suite**:
      - Port existing API tests to new Fastify endpoints
      - Test all CRUD operations
      - Validate snake_case ↔ camelCase conversion
      - Test error handling and edge cases
 
-### 6.2 Integration Testing
+### 7.2 Integration Testing
    - **End-to-End Validation**:
      - Test complete workflows (user → project → task)
      - Validate file upload functionality
      - Test search and filtering capabilities
 
-## Phase 7: Documentation & Deployment
+## Phase 8: Documentation & Deployment
 
-### 7.1 API Documentation
+### 8.1 API Documentation
    - **Documentation Updates**:
      - Update API test commands documentation
      - Document all new endpoints with examples
      - Create migration guide from Next.js to Fastify
 
-### 7.2 Deployment Preparation
+### 8.2 Deployment Preparation
    - **Production Readiness**:
      - Configure environment-specific settings
      - Set up health monitoring
