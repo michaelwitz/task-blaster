@@ -22,7 +22,7 @@ services:
   # Fastify API Server
   api:
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile
     container_name: task_blaster_api
     ports:
@@ -32,13 +32,32 @@ services:
       NODE_ENV: development
       PORT: 3030
     volumes:
-      - .:/app
+      - ./api:/app
       - /app/node_modules
     networks:
       - task_blaster_network
     depends_on:
       postgres:
         condition: service_healthy
+    command: npm run dev
+
+  # React Client (Development)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: task_blaster_client
+    ports:
+      - "3001:3001"
+    environment:
+      - VITE_API_URL=http://localhost:3030
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    networks:
+      - task_blaster_network
+    depends_on:
+      - api
     command: npm run dev
 
 volumes:
