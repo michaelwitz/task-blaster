@@ -1,6 +1,6 @@
 # Implementation Plan - Task Blaster
 
-This document provides a detailed implementation plan for transitioning the functionality of Task Blaster from the existing Next.js/TypeScript/Drizzle setup to a JavaScript/Fastify/Drizzle stack with TypeScript React client in a monorepo architecture.
+This document provides a detailed implementation plan for transitioning the functionality of Task Blaster from the existing Next.js/TypeScript/Drizzle setup to a JavaScript/Fastify/Drizzle stack with JavaScript React client in a monorepo architecture.
 
 ## Phase 1: Documentation & Foundation
 
@@ -19,7 +19,7 @@ This document provides a detailed implementation plan for transitioning the func
    - **Workspace Structure**:
      - Root package.json with npm workspaces configuration
      - `api/` - Fastify server (JavaScript ES modules)
-     - `client/` - React TypeScript application (Vite build tool)
+     - `client/` - React JavaScript application (Vite build tool)
    
    - **Build Tools**:
      - **API**: No build step required (native ES modules)
@@ -148,16 +148,24 @@ This document provides a detailed implementation plan for transitioning the func
 
 ### 4.1 Client Architecture Setup ✅
    - **Vite Configuration**:
-     - TypeScript React template with Vite build tool
+     - JavaScript React template with Vite build tool (modern, fast)
      - Port 3001 configuration (per ground rules)
-     - Path aliases (@/) for clean imports
-     - Tailwind CSS with shadcn/ui theme integration
+     - Mantine UI component library (desktop-optimized)
+     - No TypeScript complexity - pure JavaScript + JSX
    
    - **Project Structure**:
-     - `client/src/components/ui/` - Reusable UI components
-     - `client/src/lib/` - Utility functions and API services
-     - `client/src/types/` - TypeScript type definitions
+     - `client/src/components/` - React components (JSX)
+     - `client/src/services/` - API service layer with Axios
      - `client/src/hooks/` - Custom React hooks
+     - `client/src/utils/` - Utility functions
+   
+   - **Technology Stack**:
+     - **React 18** - Core framework
+     - **Mantine** - Complete UI component library (desktop-optimized)
+     - **@dnd-kit** - Modern drag & drop
+     - **React Router** - Client-side routing
+     - **Axios** - HTTP client for API calls
+     - **@tabler/icons-react** - Icon library
 
 ### 4.2 UI Component Migration
    - **Copy from Next.js Project**:

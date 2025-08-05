@@ -4,14 +4,13 @@
   "description": "A Kanban style orchestration app monorepo with Fastify API and React client",
   "private": true,
   "workspaces": [
-    "api",
-    "client"
+    "api"
   ],
   "scripts": {
     "dev:api": "npm run dev --workspace=api",
-    "dev:client": "npm run dev --workspace=client",
+    "dev:client": "cd client && npm start",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:client\"",
-    "build": "npm run build --workspace=client",
+    "build": "cd client && npm run build",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:up:db": "docker-compose up -d postgres",
