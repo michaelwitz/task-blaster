@@ -11,7 +11,7 @@
 - **Database**: PostgreSQL version 15 with existing schema and Drizzle ORM
 - **Development Philosophy**: API-first development approach
 - **API Validation**: All data validation must be enforced at the API level to support future agent communication
-- **Database Driven ORM**: Use Drizzle ORM with database driven philosophy for the backend - the Drizzle table definitions (Drizzle kit push) is the source of truth. Do not introduce new API properties that do not exist inn the database.
+- **Database Driven ORM**: Use Drizzle ORM with database driven philosophy for the backend - the Drizzle table definitions lib/db/schema.js are the source of truth. Do not introduce new API properties that do not exist in the schema
 
 ### Architecture
 
