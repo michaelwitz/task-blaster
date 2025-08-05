@@ -150,7 +150,7 @@ See [DOCKER.md](DOCKER.md) for detailed Docker documentation.
 
 ## 📚 Documentation
 
-- [Ground Rules](docs/GroundRules.md) - Development standards and conventions
+- [Ground Rules](GroundRules.md) - Development standards and conventions
 - [Functional Specs](docs/FunctionalSpecs.md) - Feature specifications
 - [Implementation Plan](docs/ImplementationPlan.md) - Technical implementation details
 - [Docker Setup](DOCKER.md) - Docker configuration and usage
