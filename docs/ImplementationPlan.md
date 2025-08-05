@@ -1,6 +1,6 @@
 # Implementation Plan - Task Blaster
 
-This document provides a detailed implementation plan for transitioning the functionality of Task Blaster from the existing Next.js/TypeScript/Drizzle setup to a JavaScript/Fastify/Drizzle stack with comprehensive API functionality.
+This document provides a detailed implementation plan for transitioning the functionality of Task Blaster from the existing Next.js/TypeScript/Drizzle setup to a JavaScript/Fastify/Drizzle stack with TypeScript React client in a monorepo architecture.
 
 ## Phase 1: Documentation & Foundation
 
@@ -14,6 +14,30 @@ This document provides a detailed implementation plan for transitioning the func
 ### 1.2 Project Initialization ✅
    - Project initialized with Git (pre-configured)
    - Basic project structure established
+
+### 1.3 Monorepo Architecture ✅
+   - **Workspace Structure**:
+     - Root package.json with npm workspaces configuration
+     - `api/` - Fastify server (JavaScript ES modules)
+     - `client/` - React TypeScript application (Vite build tool)
+   
+   - **Build Tools**:
+     - **API**: No build step required (native ES modules)
+     - **Client**: Vite for development server and production builds
+     - **Concurrent Development**: Both services run simultaneously
+   
+   - **Development Commands**:
+     - `npm run dev` - Start both API and client concurrently
+     - `npm run dev:api` - API only on port 3030
+     - `npm run dev:client` - Client only on port 3001
+     - `npm run build` - Build client for production
+   
+   - **Database Commands**:
+     - `npm run db:migrate` - Run database migrations
+     - `npm run db:seed` - Seed database with test data
+     - `npm run db:reset` - Reset and seed database
+     - `npm run docker:up` - Start PostgreSQL container
+     - `npm run docker:down` - Stop containers
 
 ## Phase 2: Core Infrastructure
 
@@ -120,9 +144,55 @@ This document provides a detailed implementation plan for transitioning the func
      - Base64 to binary conversion on-demand
      - Thumbnail data support for future implementation
 
-## Phase 4: Advanced Features
+## Phase 4: React Client Implementation
 
-### 4.1 Schema Validation
+### 4.1 Client Architecture Setup ✅
+   - **Vite Configuration**:
+     - TypeScript React template with Vite build tool
+     - Port 3001 configuration (per ground rules)
+     - Path aliases (@/) for clean imports
+     - Tailwind CSS with shadcn/ui theme integration
+   
+   - **Project Structure**:
+     - `client/src/components/ui/` - Reusable UI components
+     - `client/src/lib/` - Utility functions and API services
+     - `client/src/types/` - TypeScript type definitions
+     - `client/src/hooks/` - Custom React hooks
+
+### 4.2 UI Component Migration
+   - **Copy from Next.js Project**:
+     - Kanban board components (KanbanBoard, KanbanColumn, TaskCard)
+     - Form components (NewTaskDialog, EditTaskDialog, EditProjectDialog)
+     - shadcn/ui components (Button, Dialog, Input, Select, etc.)
+     - Drag-and-drop functionality (@dnd-kit)
+   
+   - **Adapt for Fastify API**:
+     - Update type definitions to match API responses
+     - Replace Next.js API routes with direct fetch calls
+     - Implement API service layer for client-server communication
+     - Handle camelCase API responses
+
+### 4.3 State Management & API Integration
+   - **API Service Layer**:
+     - Create service functions for all API endpoints
+     - Handle HTTP client configuration and error handling
+     - Implement request/response transformation
+   
+   - **State Management**:
+     - React hooks for local state management
+     - Custom hooks for API data fetching
+     - Optimistic UI updates for better user experience
+
+### 4.4 Routing & Navigation
+   - **React Router Setup**:
+     - Project list page
+     - Kanban board page for individual projects
+     - Navigation between projects
+     - URL-based project selection
+
+## Phase 5: Advanced Features
+
+### 5.1 Schema Validation
    - **Request/Response Schemas**:
      - Use Fastify's built-in AJV (JSON Schema) validation for maximum performance
      - Define JSON schemas for all endpoints with proper validation rules

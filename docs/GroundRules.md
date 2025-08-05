@@ -4,20 +4,30 @@
 
 ### Core Requirements
 
-- **JavaScript Only**: Use only JavaScript and JSX - no TypeScript
+- **Monorepo Structure**: Project uses a monorepo with separate `client` and `api` workspaces
+- **JavaScript Only API**: The API is strictly modern JavaScript
+- **TypeScript Client**: The client is written in TypeScript and uses Vite as the build tool
 - **Node.js Version**: Run on Node.js 22 LTS or higher
 - **Frontend**: React.js client with development server
 - **Backend**: Latest version of Fastify framework
 - **Database**: PostgreSQL version 15 with existing schema and Drizzle ORM
 - **Development Philosophy**: API-first development approach
 - **API Validation**: All data validation must be enforced at the API level to support future agent communication
-- **Database Driven ORM**: Use Drizzle ORM with database driven philosophy for the backend - the Drizzle table definitions (Drizzle kit push) is the source of truth. Do not introduce new API properties that do not exist inn the database.
+- **Database Driven ORM**: Use Drizzle ORM with database driven philosophy for the backend - the Drizzle table definitions (Drizzle kit push) is the source of truth. Do not introduce new API properties that do not exist in the database.
 
 ### Architecture
 
+- **Monorepo Structure**: 
+  - `api/` - Fastify API server (JavaScript)
+  - `client/` - React TypeScript application (Vite)
+  - Root workspace manages both with npm workspaces
 - **Client-Server Separation**: React client uses development server, Fastify handles API
 - **Database**: Reuse existing PostgreSQL schema and Drizzle ORM configuration
 - **Containerization**: Docker Compose for database and services
+- **Build Tools**:
+  - **API**: Node.js native ES modules, no build step required
+  - **Client**: Vite for development server and production builds
+  - **Development**: Concurrent execution of both services via npm scripts
 
 ### Development Standards
 
@@ -92,6 +102,21 @@
 - **Documentation Review**: Include functional spec updates in all pull requests that add or modify features
 - **Version Alignment**: Ensure functional specs accurately reflect the current state of the application
 
+### Essential Development Commands
+
+- **Start Services**:
+  - `npm run dev` - Both API and client concurrently
+  - `npm run dev:api` - API only (port 3030)
+  - `npm run dev:client` - Client only (port 3001)
+- **Database Operations**:
+  - `npm run db:migrate` - Run database migrations
+  - `npm run db:seed` - Seed with test data
+  - `npm run db:reset` - Reset and seed database
+- **Docker Operations**:
+  - `npm run docker:up` - Start PostgreSQL container
+  - `npm run docker:down` - Stop containers
+- **Build**: `npm run build` - Build client for production
+
 ### Development Workflow
 
 - **Git Synchronization**: Before starting any new work, always check git status and sync with main
@@ -147,9 +172,9 @@
 
 ### Migration Strategy
 
-- **Back end migration complete**
-- **Frontend Components**: Convert TypeScript React components to JavaScript/JSX
-- **Styling**: Preserve existing Tailwind CSS and component styling
+- **Backend**: Complete (JavaScript/Fastify/Drizzle)
+- **Frontend**: TypeScript React client with Vite build tool
+- **Styling**: Preserve existing Tailwind CSS and shadcn/ui components
 
 ## License
 

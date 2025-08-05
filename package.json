@@ -1,19 +1,25 @@
 {
-  "name": "task-blaster",
+  "name": "task-blaster-monorepo",
   "version": "0.1.0",
-  "description": "A Kanban style orchestration app intended to coordinate AI agents with users executing on a project.",
-  "main": "src/server.js",
-  "type": "module",
+  "description": "A Kanban style orchestration app monorepo with Fastify API and React client",
+  "private": true,
+  "workspaces": [
+    "api",
+    "client"
+  ],
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "db:push": "drizzle-kit push",
-    "db:seed": "node scripts/seed-all.js",
-    "db:reset": "node scripts/reset-and-seed.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:api": "npm run dev --workspace=api",
+    "dev:client": "npm run dev --workspace=client",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:client\"",
+    "build": "npm run build --workspace=client",
+    "docker:up": "docker-compose -f api/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f api/docker-compose.yml down",
+    "db:migrate": "npm run db:migrate --workspace=api",
+    "db:seed": "npm run db:seed --workspace=api",
+    "db:reset": "npm run db:reset --workspace=api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   },
   "repository": {
     "type": "git",
@@ -21,24 +27,9 @@
   },
   "keywords": [
     "agentic",
-    "kanban"
+    "kanban",
+    "monorepo"
   ],
   "author": "Michael Woytowitz",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/michaelwitz/task-blaster/issues"
-  },
-  "homepage": "https://github.com/michaelwitz/task-blaster#readme",
-  "dependencies": {
-    "@fastify/cors": "^11.1.0",
-    "@fastify/multipart": "^9.0.3",
-    "@fastify/swagger": "^9.5.1",
-    "@fastify/swagger-ui": "^5.2.3",
-    "drizzle-kit": "^0.31.4",
-    "drizzle-orm": "^0.44.4",
-    "fastify": "^5.4.0",
-    "fastify-plugin": "^5.0.1",
-    "pino": "^9.7.0",
-    "postgres": "^3.4.7"
-  }
+  "license": "ISC"
 }
