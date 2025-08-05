@@ -5,7 +5,7 @@ This document provides a detailed implementation plan for transitioning the func
 ## Phase 1: Documentation & Foundation
 
 ### 1.1 Documentation Setup ✅
-   - Create `GroundRules.md` with technology stack and best practices
+   - Create `GroundRules.md` in project root with technology stack and best practices
    - Create `FunctionalSpecs.md` with detailed requirements
    - Update `ImplementationPlan.md` with comprehensive approach
    - Document database naming conventions (snake_case ↔ camelCase)
