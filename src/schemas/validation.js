@@ -117,7 +117,9 @@ export const taskSchemas = {
         priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'], default: 'MEDIUM' },
         dueDate: { type: 'string', format: 'date-time', nullable: true },
         assigneeId: { type: 'integer', minimum: 1, nullable: true },
-        position: { type: 'integer', minimum: 0 }
+        position: { type: 'integer', minimum: 0 },
+        git_feature_branch: { type: 'string', maxLength: 255 },
+        git_pull_request_url: { type: 'string', maxLength: 500 }
       },
       required: ['title', 'projectId'],
       additionalProperties: false
@@ -136,7 +138,9 @@ export const taskSchemas = {
         priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] },
         dueDate: { type: 'string', format: 'date-time', nullable: true },
         assigneeId: { type: 'integer', minimum: 1, nullable: true },
-        position: { type: 'integer', minimum: 0 }
+        position: { type: 'integer', minimum: 0 },
+        git_feature_branch: { type: 'string', maxLength: 255 },
+        git_pull_request_url: { type: 'string', maxLength: 500 }
       },
       additionalProperties: false
     }

@@ -8,6 +8,11 @@ The following functional specifications are intended to outline all key requirem
    - Drag-and-drop task management across multiple columns (Todo, In Progress, In Review, Done)
    - Auto-generated, human-readable task identifiers for easy reference
    - Task lifecycle tracking with automatic timestamps for task creation, start, and completion dates
+   - **Sparse Numbering System**: Task positions use sparse numbering (increments of 10) for efficient drag-and-drop operations
+     - New tasks start at position 10, 20, 30, etc.
+     - Allows for easy insertion between existing tasks without requiring database updates for all subsequent tasks
+     - Example: When inserting between position 10 and 20, new task gets position 15
+     - Optimizes performance by minimizing database writes during reordering operations
 
 2. **Project Management**
    - Create and manage multiple projects with team leaders and unique codes

@@ -241,6 +241,8 @@ class DatabaseService {
       prompt: TASKS.prompt,
       isBlocked: TASKS.is_blocked,
       blockedReason: TASKS.blocked_reason,
+      gitFeatureBranch: TASKS.git_feature_branch,
+      gitPullRequestUrl: TASKS.git_pull_request_url,
       startedAt: TASKS.started_at,
       completedAt: TASKS.completed_at,
       createdAt: TASKS.created_at,
@@ -282,6 +284,8 @@ class DatabaseService {
       prompt: TASKS.prompt,
       isBlocked: TASKS.is_blocked,
       blockedReason: TASKS.blocked_reason,
+      gitFeatureBranch: TASKS.git_feature_branch,
+      gitPullRequestUrl: TASKS.git_pull_request_url,
       startedAt: TASKS.started_at,
       completedAt: TASKS.completed_at,
       createdAt: TASKS.created_at,
@@ -348,6 +352,8 @@ class DatabaseService {
       prompt: TASKS.prompt,
       isBlocked: TASKS.is_blocked,
       blockedReason: TASKS.blocked_reason,
+      gitFeatureBranch: TASKS.git_feature_branch,
+      gitPullRequestUrl: TASKS.git_pull_request_url,
       startedAt: TASKS.started_at,
       completedAt: TASKS.completed_at,
       createdAt: TASKS.created_at,
@@ -413,6 +419,8 @@ class DatabaseService {
           prompt: taskData.prompt,
           is_blocked: taskData.isBlocked || false,
           blocked_reason: taskData.blockedReason,
+          git_feature_branch: taskData.gitFeatureBranch,
+          git_pull_request_url: taskData.gitPullRequestUrl,
           started_at: taskData.startedAt,
           completed_at: taskData.completedAt
         })
@@ -445,6 +453,8 @@ class DatabaseService {
     if (taskData.prompt !== undefined) updateData.prompt = taskData.prompt;
     if (taskData.isBlocked !== undefined) updateData.is_blocked = taskData.isBlocked;
     if (taskData.blockedReason !== undefined) updateData.blocked_reason = taskData.blockedReason;
+    if (taskData.gitFeatureBranch !== undefined) updateData.git_feature_branch = taskData.gitFeatureBranch;
+    if (taskData.gitPullRequestUrl !== undefined) updateData.git_pull_request_url = taskData.gitPullRequestUrl;
     if (taskData.startedAt !== undefined) updateData.started_at = taskData.startedAt;
     if (taskData.completedAt !== undefined) updateData.completed_at = taskData.completedAt;
     

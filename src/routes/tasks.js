@@ -1,4 +1,5 @@
 import { taskSchemas } from '../schemas/validation.js';
+import { applyGitStatus } from '../services/gitStatus.js';
 
 export default async function taskRoutes(fastify, options) {
   const { dbService } = options;
@@ -52,7 +53,8 @@ export default async function taskRoutes(fastify, options) {
     schema: taskSchemas.createTask
   }, async (request, reply) => {
     try {
-      const task = await dbService.createTask(request.body);
+      const taskData = applyGitStatus(request.body);
+      const task = await dbService.createTask(taskData);
       reply.code(201).send(task);
     } catch (error) {
       fastify.log.error(error);
@@ -66,7 +68,18 @@ export default async function taskRoutes(fastify, options) {
   }, async (request, reply) => {
     try {
       const { id } = request.params;
-      const task = await dbService.updateTask(parseInt(id), request.body);
+      
+      // Get current task to check current status for Git transitions
+      const currentTask = await dbService.getTaskById(parseInt(id));
+      if (!currentTask) {
+        return reply.code(404).send({ error: 'Task not found' });
+      }
+      
+      // Apply Git status transitions with current task state
+      const taskDataWithCurrentStatus = { ...request.body, status: currentTask.status };
+      const taskData = applyGitStatus(taskDataWithCurrentStatus);
+      
+      const task = await dbService.updateTask(parseInt(id), taskData);
       
       if (!task) {
         return reply.code(404).send({ error: 'Task not found' });
