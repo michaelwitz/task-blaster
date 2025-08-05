@@ -8,10 +8,10 @@
 - **Node.js Version**: Run on Node.js 22 LTS or higher
 - **Frontend**: React.js client with development server
 - **Backend**: Latest version of Fastify framework
-- **Database**: PostgreSQL with existing schema and Drizzle ORM
+- **Database**: PostgreSQL version 15 with existing schema and Drizzle ORM
 - **Development Philosophy**: API-first development approach
 - **API Validation**: All data validation must be enforced at the API level to support future agent communication
-- **Database-First ORM**: Use Drizzle ORM with database-first philosophy - the database schema is the source of truth, not JavaScript code
+- **Database Driven ORM**: Use Drizzle ORM with database driven philosophy for the backend - the Drizzle table definitions (Drizzle kit push) is the source of truth. Do not introduce new API properties that do not exist inn the database.
 
 ### Architecture
 
@@ -35,9 +35,9 @@
   - API responses must be in camelCase for consistency
 - **Data Formatting Standards**:
   - **Keyword Values**: All keyword/enum values (status, priority, etc.) must use ENUM_CASE format
-  - **Status Values**: "TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE" 
+  - **Status Values**: "TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE"
   - **Priority Values**: "LOW", "MEDIUM", "HIGH", "CRITICAL"
-  - **Tags**: Exception to ENUM_CASE - tags use lowercase-with-hyphens format (e.g., "user-management")
+  - **Tags**: Exception to ENUM_CASE - tags use lowercase-with-hyphens (kabob-case) format (e.g., "user-management")
   - **Consistency**: All seed data, validation schemas, and API responses must follow these standards
   - **Database Storage**: Keywords stored as ENUM_CASE values in database for consistency
   - **API Validation**: Server-side validation enforces proper keyword formats
@@ -122,12 +122,6 @@
 
 ### GitHub Integration Setup
 
-- **Primary Authentication Method**: Use GitHub Personal Access Token (PAT) stored in environment variable `GH_TOKEN`
-- **Token Setup Process**:
-  1. Create GitHub PAT with `repo`, `workflow`, and `write:packages` scopes
-  2. Add to `~/.zshrc`: `export GH_TOKEN=your_token_here`
-  3. Reload environment: `source ~/.zshrc`
-  4. Verify authentication: `gh auth status`
 - **Git Repository Configuration**:
   - Keep standard remote format: `https://github.com/owner/repo.git`
   - Verify with: `git remote get-url origin`
@@ -153,8 +147,7 @@
 
 ### Migration Strategy
 
-- **Database Schema**: Direct migration from existing PostgreSQL setup
-- **API Endpoints**: Port existing Next.js API routes to Fastify routes
+- **Back end migration complete**
 - **Frontend Components**: Convert TypeScript React components to JavaScript/JSX
 - **Styling**: Preserve existing Tailwind CSS and component styling
 
