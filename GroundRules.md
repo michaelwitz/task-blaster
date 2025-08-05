@@ -93,6 +93,21 @@
 - **Git**: Use conventional commit messages and proper branching
 - **API Testing**: Always pipe JSON API responses through `jq` for readable formatting (e.g., `curl ... | jq`)
 
+### Git Configuration and .gitignore Files
+
+- **Repository Structure**: Three-level `.gitignore` configuration for comprehensive coverage:
+  - **Root `.gitignore`**: Workspace-level ignores (node_modules/, dist/, logs, editor files, environment files)
+  - **API `.gitignore`**: API-specific ignores (mirrors root with API-specific patterns)
+  - **Client `.gitignore`**: Client-specific ignores (includes dist-ssr/, *.local for Vite)
+- **Node Modules**: All `node_modules/` directories excluded from version control across all workspaces
+- **Build Artifacts**: `dist/`, `dist-ssr/` directories ignored to prevent build output commits
+- **Environment Files**: `.env`, `.env.local`, `.env.*.local` files excluded for security
+  - **Template Files**: `.env.example` files are tracked as templates for environment setup
+  - **Security**: Environment files contain sensitive data (API keys, database credentials) and must never be committed
+- **Logs and Debug Files**: All log files and debug output excluded
+- **Editor Configuration**: IDE/editor directories ignored except for shared extensions config
+- **Critical Rule**: The root workspace .gitignore prevents any sensitive files from being accidentally committed
+
 ### Documentation Standards
 
 - **Functional Specifications**: Keep `FunctionalSpecs.md` updated with all new features and capabilities
