@@ -74,7 +74,6 @@ This document provides a detailed implementation plan for transitioning the func
    
    - **Plugin Architecture**:
      - Create plugin system for modular route organization
-     - Implement API versioning with `/api/v1` prefix
      - Set up response transformation hooks (snake_case → camelCase)
 
 ## Phase 3: API Implementation
@@ -83,10 +82,9 @@ This document provides a detailed implementation plan for transitioning the func
    - **Health & System Routes**:
      - `GET /health` - Health check endpoint
      - `GET /` - API information and version
-     - `GET /api/v1/db-test` - Database connection test
 
 ### 3.2 User Management API
-   - **User Routes** (`/api/v1/users`):
+   - **User Routes** (`/users`):
      - `GET /users` - List all users with search capability
      - `GET /users/:id` - Get specific user by ID
      - `POST /users` - Create new user
@@ -95,7 +93,7 @@ This document provides a detailed implementation plan for transitioning the func
      - `GET /users/search?q=term` - Search users by name/email
 
 ### 3.3 Project Management API
-   - **Project Routes** (`/api/v1/projects`):
+   - **Project Routes** (`/projects`):
      - `GET /projects` - List projects with leader info and task counts
      - `GET /projects/:id` - Get specific project with full details
      - `POST /projects` - Create new project
@@ -106,7 +104,7 @@ This document provides a detailed implementation plan for transitioning the func
      - `DELETE /projects/:id/image` - Remove project image
 
 ### 3.4 Task Management API
-   - **Task Routes** (`/api/v1/tasks`):
+   - **Task Routes** (`/tasks`):
      - `GET /tasks` - List all tasks with filters
      - `GET /tasks/:id` - Get specific task with assignees and tags
      - `POST /tasks` - Create new task with proper positioning
@@ -116,7 +114,7 @@ This document provides a detailed implementation plan for transitioning the func
      - `GET /tasks/search?q=term` - Search tasks
 
 ### 3.5 Tag Management API
-   - **Tag Routes** (`/api/v1/tags`):
+   - **Tag Routes** (`/tags`):
      - `GET /tags` - List all tags with usage counts
      - `GET /tags/:id` - Get specific tag
      - `POST /tags` - Create new tag

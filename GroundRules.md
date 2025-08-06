@@ -56,7 +56,6 @@
 
 - **Route Organization**:
   - Use Fastify plugins for route grouping and modularity
-  - Implement route prefixes for API versioning (e.g., `/api/v1`)
   - Group related routes in separate plugin files (users, projects, tasks, tags)
   - Use proper HTTP methods (GET, POST, PUT, DELETE, PATCH)
 - **Middleware & Hooks**:
