@@ -31,7 +31,9 @@
     "setAccessToken": "Définir le Token d'Accès",
     "accessToken": "Token d'Accès",
     "enterAccessToken": "Entrez votre token d'accès",
-    "tokenSaved": "Token d'accès enregistré avec succès"
+    "tokenSaved": "Token d'accès enregistré avec succès",
+    "actions": "Actions",
+    "keyboardShortcut": "Raccourci clavier"
   },
   "navigation": {
     "home": "Accueil",
@@ -64,6 +66,7 @@
     "newTask": "Nouvelle Tâche",
     "taskId": "ID de Tâche",
     "title": "Titre",
+    "description": "Description",
     "status": "Statut",
     "priority": "Priorité",
     "assignee": "Assigné",

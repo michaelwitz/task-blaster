@@ -31,7 +31,9 @@
     "setAccessToken": "Set Access Token",
     "accessToken": "Access Token",
     "enterAccessToken": "Enter your access token",
-    "tokenSaved": "Access token saved successfully"
+    "tokenSaved": "Access token saved successfully",
+    "actions": "Actions",
+    "keyboardShortcut": "Keyboard shortcut"
   },
   "navigation": {
     "home": "Home",
@@ -64,6 +66,7 @@
     "newTask": "New Task",
     "taskId": "Task ID",
     "title": "Title",
+    "description": "Description",
     "status": "Status",
     "priority": "Priority",
     "assignee": "Assignee",

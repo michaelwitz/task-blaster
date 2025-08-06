@@ -31,7 +31,9 @@
     "setAccessToken": "Zugriffstoken setzen",
     "accessToken": "Zugriffstoken",
     "enterAccessToken": "Geben Sie Ihren Zugriffstoken ein",
-    "tokenSaved": "Zugriffstoken erfolgreich gespeichert"
+    "tokenSaved": "Zugriffstoken erfolgreich gespeichert",
+    "actions": "Aktionen",
+    "keyboardShortcut": "Tastenkürzel"
   },
   "navigation": {
     "home": "Startseite",
@@ -64,6 +66,7 @@
     "newTask": "Neue Aufgabe",
     "taskId": "Aufgaben-ID",
     "title": "Titel",
+    "description": "Beschreibung",
     "status": "Status",
     "priority": "Priorität",
     "assignee": "Zugewiesen",
