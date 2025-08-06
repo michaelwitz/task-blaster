@@ -59,7 +59,7 @@ async function resetAndSeed() {
 
     console.log('✅ Database reset and seeding completed successfully!');
     console.log('📊 Summary:');
-    console.log('   • 4 users created');
+    console.log('   • 5 users created (including Michael Woytowitz)');
     console.log('   • 3 projects created');
     console.log('   • 10 tags created (with colors)');
     console.log('   • 5 tasks created');

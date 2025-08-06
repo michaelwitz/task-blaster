@@ -17,7 +17,7 @@
 
 ### Architecture
 
-- **Monorepo Structure**: 
+- **Monorepo Structure**:
   - `api/` - Fastify API server (JavaScript)
   - `client/` - React TypeScript application (Vite)
   - Root workspace manages both with npm workspaces
@@ -43,6 +43,7 @@
   - All mapping from camel to snake and snake to camel can be handled by the ORM
   - Avoid post-processing property mapping functions for better performance
   - API responses must be in camelCase for consistency
+  - **Security**: Access tokens and other sensitive data must never be returned in API responses
 - **Data Formatting Standards**:
   - **Keyword Values**: All keyword/enum values (status, priority, etc.) must use ENUM_CASE format
   - **Status Values**: "TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE"
@@ -97,7 +98,7 @@
 - **Repository Structure**: Three-level `.gitignore` configuration for comprehensive coverage:
   - **Root `.gitignore`**: Workspace-level ignores (node_modules/, dist/, logs, editor files, environment files)
   - **API `.gitignore`**: API-specific ignores (mirrors root with API-specific patterns)
-  - **Client `.gitignore`**: Client-specific ignores (includes dist-ssr/, *.local for Vite)
+  - **Client `.gitignore`**: Client-specific ignores (includes dist-ssr/, \*.local for Vite)
 - **Node Modules**: All `node_modules/` directories excluded from version control across all workspaces
 - **Build Artifacts**: `dist/`, `dist-ssr/` directories ignored to prevent build output commits
 - **Environment Files**: `.env`, `.env.local`, `.env.*.local` files excluded for security

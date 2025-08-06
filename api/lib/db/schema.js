@@ -6,6 +6,7 @@ export const USERS = pgTable('USERS', {
   id: serial('id').primaryKey(),
   full_name: varchar('full_name', { length: 200 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
+  access_token: varchar('access_token', { length: 255 }).notNull().unique(),
   created_at: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
