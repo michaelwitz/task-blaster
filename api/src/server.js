@@ -1,5 +1,6 @@
 import Fastify from 'fastify';
 import { randomUUID } from 'crypto';
+import { tokenService } from './services/tokenService.js';
 
 // Create Fastify instance with built-in Pino logger
 const app = Fastify({
@@ -27,6 +28,9 @@ app.register(routes);
 // Start server
 const start = async () => {
   try {
+    // Initialize token service before starting server
+    await tokenService.initialize();
+    
     await app.listen({ port: process.env.PORT || 3030, host: '0.0.0.0' });
     app.log.info(`Server running at http://localhost:${process.env.PORT || 3030}`);
   } catch (err) {

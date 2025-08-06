@@ -1,4 +1,5 @@
 import DatabaseService from '../services/databaseService.js';
+import { tokenService } from '../services/tokenService.js';
 
 // Import route plugins
 import userRoutes from './users.js';
@@ -12,7 +13,15 @@ const dbService = new DatabaseService();
 export default async function routes(fastify, options) {
   // Health check endpoint
   fastify.get('/health', async (request, reply) => {
-    reply.send({ status: 'ok', timestamp: new Date().toISOString() });
+    const tokenStats = tokenService.getCacheStats();
+    reply.send({ 
+      status: 'ok', 
+      timestamp: new Date().toISOString(),
+      auth: {
+        tokenCacheInitialized: tokenStats.isInitialized,
+        userCount: tokenStats.userCount
+      }
+    });
   });
 
   // Root endpoint
@@ -33,6 +42,17 @@ export default async function routes(fastify, options) {
       fastify.log.error(error);
       reply.code(500).send({ error: 'Database connection failed', details: error.message });
     }
+  });
+
+  // Token info endpoint (for debugging)
+  fastify.get('/token-info', async (request, reply) => {
+    const tokenStats = tokenService.getCacheStats();
+    reply.send({
+      cacheInitialized: tokenStats.isInitialized,
+      userCount: tokenStats.userCount,
+      // Don't expose actual tokens in production
+      hasTokens: tokenStats.tokens.length > 0
+    });
   });
 
   // Register route plugins with shared database service

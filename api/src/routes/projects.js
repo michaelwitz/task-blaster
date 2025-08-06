@@ -1,7 +1,11 @@
 import { projectSchemas } from '../schemas/validation.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 export default async function projectRoutes(fastify, options) {
   const { dbService } = options;
+
+  // Add authentication middleware to all project routes
+  fastify.addHook('preHandler', authMiddleware);
 
   // GET /projects - List all projects with details
   fastify.get('/projects', {
