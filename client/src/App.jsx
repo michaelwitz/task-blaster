@@ -1,16 +1,83 @@
-import { MantineProvider, Container, Title, Text, Button, Group, Paper, Stack, AppShell, ActionIcon, Flex, createTheme } from '@mantine/core';
-import { IconSun, IconMoon, IconDashboard } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
+import { 
+  MantineProvider, 
+  AppShell, 
+  ActionIcon, 
+  Text, 
+  Group, 
+  Flex, 
+  Menu
+} from '@mantine/core';
+import { createTheme } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { 
+  IconSun, 
+  IconMoon, 
+  IconDashboard, 
+  IconMenu2, 
+  IconKey
+} from '@tabler/icons-react';
+import { TokenModal } from './components/TokenModal.jsx';
+import { HomePage } from './pages/HomePage.jsx';
+import { KanbanPage } from './pages/KanbanPage.jsx';
 import '@mantine/core/styles.css';
 
 function App() {
-  const [colorScheme, setColorScheme] = useState('dark'); // Default to dark mode
+  const [colorScheme, setColorScheme] = useState('dark');
+  const [accessToken, setAccessToken] = useState('');
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'kanban'
+  const [opened, { open, close }] = useDisclosure(false);
+
+  // Fetch projects with a specific token
+  const fetchProjectsWithToken = async (token) => {
+    console.log('fetchProjectsWithToken called with:', token);
+    if (!token) return;
+
+    setLoading(true);
+    try {
+      console.log('Fetching projects from API...');
+      const response = await fetch('http://localhost:3030/projects', {
+        method: 'GET',
+        headers: {
+          'TB_TOKEN': token,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('API response status:', response.status);
+      console.log('API response headers:', response.headers);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Projects fetched:', data);
+        setProjects(data);
+      } else {
+        const errorText = await response.text();
+        console.error('Failed to fetch projects:', response.status, errorText);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Check for saved theme preference, default to dark
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setColorScheme(savedTheme);
+    }
+
+    // Check for saved access token
+    const savedToken = localStorage.getItem('TB_TOKEN');
+    if (savedToken) {
+      setAccessToken(savedToken);
+      // Auto-load projects if token exists
+      fetchProjectsWithToken(savedToken);
     }
   }, []);
 
@@ -20,17 +87,77 @@ function App() {
     localStorage.setItem('theme', newTheme);
   };
 
+  const handleSetToken = (token) => {
+    console.log('App handleSetToken called with:', token);
+    setAccessToken(token);
+    localStorage.setItem('TB_TOKEN', token);
+    console.log('Token saved to localStorage');
+    close();
+    console.log('Modal closed, fetching projects...');
+    // Auto-load projects after setting token
+    fetchProjectsWithToken(token);
+  };
+
+  const handleProjectSelect = (project) => {
+    setSelectedProject(project);
+    setCurrentPage('kanban');
+  };
+
+  const handleBackToProjects = () => {
+    setSelectedProject(null);
+    setCurrentPage('home');
+  };
+
   const theme = createTheme({
     // You can customize theme here if needed
   });
 
+  // Render current page
+  const renderCurrentPage = () => {
+    if (currentPage === 'kanban') {
+      return (
+        <KanbanPage 
+          selectedProject={selectedProject}
+          onBackToProjects={handleBackToProjects}
+        />
+      );
+    }
+    
+    return (
+      <HomePage 
+        projects={projects}
+        loading={loading}
+        accessToken={accessToken}
+        onProjectSelect={handleProjectSelect}
+      />
+    );
+  };
+
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark" forceColorScheme={colorScheme}>
       <AppShell padding="md">
-        {/* Header with theme toggle in top right */}
+        {/* Header with hamburger menu and theme toggle */}
         <AppShell.Header p="md">
           <Flex justify="space-between" align="center">
             <Group>
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon variant="subtle" size="lg">
+                    <IconMenu2 size={20} />
+                  </ActionIcon>
+                </Menu.Target>
+
+                <Menu.Dropdown>
+                  <Menu.Label>Settings</Menu.Label>
+                  <Menu.Item 
+                    leftSection={<IconKey size={14} />}
+                    onClick={open}
+                  >
+                    Set Access Token
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+              
               <IconDashboard size={24} stroke={1.5} />
               <Text size="lg" fw={700}>Task Blaster</Text>
             </Group>
@@ -48,39 +175,34 @@ function App() {
 
         {/* Main content */}
         <AppShell.Main>
-          <Container size="lg" py="xl">
-            <Stack align="center" gap="xl">
-              <Paper shadow="sm" p="xl" radius="md" w="100%" maw={600}>
-                <Stack align="center" gap="md">
-                  <IconDashboard size={48} stroke={1.5} />
-                  <Title order={1} ta="center">Hello World!</Title>
-                  <Text size="lg" ta="center" c="dimmed">
-                    Kanban Project Management Platform
-                  </Text>
-                  <Text size="sm" ta="center">
-                    Modern React SPA built with Vite + Mantine + JavaScript
-                  </Text>
-                  
-                  <Group justify="center" gap="md" mt="md">
-                    <Button variant="filled" size="md">
-                      Get Started
-                    </Button>
-                    <Button variant="light" size="md">
-                      View Projects
-                    </Button>
-                  </Group>
-                  
-                  <Paper bg={colorScheme === 'dark' ? 'dark.6' : 'gray.1'} p="md" radius="sm" w="100%" mt="lg">
-                    <Text size="xs" ta="center" c="dimmed">
-                      ✅ Vite + React (JavaScript) • ✅ Mantine UI • ✅ Dark Theme Default • ✅ Ready for Kanban
-                    </Text>
-                  </Paper>
-                </Stack>
-              </Paper>
-            </Stack>
-          </Container>
+          {renderCurrentPage()}
         </AppShell.Main>
       </AppShell>
+
+      {/* Token Modal */}
+      <TokenModal 
+        opened={opened} 
+        onClose={close} 
+        onSetToken={handleSetToken} 
+      />
+
+      {/* Debug info - remove in production */}
+      <div style={{ 
+        position: 'fixed', 
+        bottom: '10px', 
+        right: '10px', 
+        background: 'rgba(0,0,0,0.8)', 
+        color: 'white', 
+        padding: '10px', 
+        borderRadius: '5px', 
+        fontSize: '12px',
+        maxWidth: '300px'
+      }}>
+        <div>Token: {accessToken ? 'Set' : 'Not set'}</div>
+        <div>localStorage: {localStorage.getItem('TB_TOKEN') ? 'Has token' : 'No token'}</div>
+        <div>Projects: {projects.length}</div>
+        <div>Page: {currentPage}</div>
+      </div>
     </MantineProvider>
   );
 }

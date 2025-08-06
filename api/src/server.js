@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import { randomUUID } from 'crypto';
 import { tokenService } from './services/tokenService.js';
+import cors from '@fastify/cors';
 
 // Create Fastify instance with built-in Pino logger
 const app = Fastify({
@@ -28,6 +29,12 @@ app.register(routes);
 // Start server
 const start = async () => {
   try {
+    // Register CORS
+    await app.register(cors, {
+      origin: ['http://localhost:3001', 'http://127.0.0.1:3001'],
+      credentials: true
+    });
+
     // Initialize token service before starting server
     await tokenService.initialize();
     
