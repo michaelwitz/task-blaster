@@ -2,6 +2,7 @@ import { eq, and, sql, desc, asc, like, or, inArray } from 'drizzle-orm';
 import { db } from '../../lib/db/index.js';
 import { USERS, PROJECTS, TASKS, TAGS, TASK_TAGS, IMAGE_METADATA, IMAGE_DATA } from '../../lib/db/schema.js';
 import { getRandomTagColor } from '../utils/tagColors.js';
+import { randomUUID } from 'crypto';
 
 /**
  * Database Service
@@ -61,7 +62,8 @@ class DatabaseService {
     const [user] = await db.insert(USERS)
       .values({
         full_name: userData.fullName,
-        email: userData.email
+        email: userData.email,
+        access_token: userData.accessToken || randomUUID()
       })
       .returning();
     
