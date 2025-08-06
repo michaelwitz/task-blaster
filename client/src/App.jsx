@@ -20,9 +20,11 @@ import {
 import { TokenModal } from './components/TokenModal.jsx';
 import { HomePage } from './pages/HomePage.jsx';
 import { KanbanPage } from './pages/KanbanPage.jsx';
+import { useTranslation } from './hooks/useTranslation.js';
 import '@mantine/core/styles.css';
 
 function App() {
+  const { t } = useTranslation();
   const [colorScheme, setColorScheme] = useState('dark');
   const [accessToken, setAccessToken] = useState('');
   const [projects, setProjects] = useState([]);
@@ -148,12 +150,12 @@ function App() {
                 </Menu.Target>
 
                 <Menu.Dropdown>
-                  <Menu.Label>Settings</Menu.Label>
+                  <Menu.Label>{t('common.settings')}</Menu.Label>
                   <Menu.Item 
                     leftSection={<IconKey size={14} />}
                     onClick={open}
                   >
-                    Set Access Token
+                    {t('common.setAccessToken')}
                   </Menu.Item>
                 </Menu.Dropdown>
               </Menu>

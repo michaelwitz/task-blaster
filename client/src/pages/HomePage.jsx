@@ -1,17 +1,20 @@
 import { Container, Title, Text, Alert } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { ProjectList } from '../components/ProjectList.jsx';
+import { useTranslation } from '../hooks/useTranslation.js';
 
 export function HomePage({ projects, loading, accessToken, onProjectSelect }) {
+  const { t } = useTranslation();
+
   if (!accessToken) {
     return (
       <Container size="lg" py="xl">
         <Alert 
           icon={<IconAlertCircle size={16} />} 
-          title="Access Token Required" 
+          title={t('common.accessTokenRequired')} 
           color="blue"
         >
-          Please set your access token using the menu in the top left to view projects.
+          {t('common.pleaseSetAccessToken')}
         </Alert>
       </Container>
     );
@@ -19,7 +22,7 @@ export function HomePage({ projects, loading, accessToken, onProjectSelect }) {
 
   return (
     <Container size="lg" py="xl" mt="md">
-      <Title order={1} mb="lg">Projects</Title>
+      <Title order={1} mb="lg">{t('projects.title')}</Title>
       <ProjectList 
         projects={projects} 
         loading={loading} 

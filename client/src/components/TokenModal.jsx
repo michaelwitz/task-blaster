@@ -1,7 +1,9 @@
 import { Modal, TextInput, Button, Stack } from '@mantine/core';
 import { useState } from 'react';
+import { useTranslation } from '../hooks/useTranslation.js';
 
 export function TokenModal({ opened, onClose, onSetToken }) {
+  const { t } = useTranslation();
   const [token, setToken] = useState('');
 
   const handleSetToken = () => {
@@ -19,18 +21,18 @@ export function TokenModal({ opened, onClose, onSetToken }) {
   };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Set Access Token" centered>
+    <Modal opened={opened} onClose={onClose} title={t('common.setAccessToken')} centered>
       <Stack>
         <TextInput
-          label="Access Token"
-          placeholder="Enter your access token"
+          label={t('common.accessToken')}
+          placeholder={t('common.enterAccessToken')}
           value={token}
           onChange={(e) => setToken(e.target.value)}
           onKeyPress={handleKeyPress}
           required
         />
         <Button onClick={handleSetToken} fullWidth>
-          Set Token
+          {t('common.setAccessToken')}
         </Button>
       </Stack>
     </Modal>
