@@ -31,7 +31,9 @@
     "setAccessToken": "Zugriffstoken setzen",
     "accessToken": "Zugriffstoken",
     "enterAccessToken": "Geben Sie Ihren Zugriffstoken ein",
-    "tokenSaved": "Zugriffstoken erfolgreich gespeichert"
+    "tokenSaved": "Zugriffstoken erfolgreich gespeichert",
+    "actions": "Aktionen",
+    "keyboardShortcut": "Tastenkürzel"
   },
   "navigation": {
     "home": "Startseite",
@@ -64,12 +66,13 @@
     "newTask": "Neue Aufgabe",
     "taskId": "Aufgaben-ID",
     "title": "Titel",
+    "prompt": "Prompt",
     "status": "Status",
     "priority": "Priorität",
     "assignee": "Zugewiesen",
     "assigneeName": "Name des Zugewiesenen",
     "storyPoints": "Story Points",
-    "tags": "Tags",
+
     "prompt": "Prompt",
     "isBlocked": "Blockiert",
     "blockedReason": "Blockierungsgrund",

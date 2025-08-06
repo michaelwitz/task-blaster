@@ -31,7 +31,9 @@
     "setAccessToken": "Configurar Token de Acceso",
     "accessToken": "Token de Acceso",
     "enterAccessToken": "Ingrese su token de acceso",
-    "tokenSaved": "Token de acceso guardado exitosamente"
+    "tokenSaved": "Token de acceso guardado exitosamente",
+    "actions": "Acciones",
+    "keyboardShortcut": "Atajo de teclado"
   },
   "navigation": {
     "home": "Inicio",
@@ -64,12 +66,13 @@
     "newTask": "Nueva Tarea",
     "taskId": "ID de Tarea",
     "title": "Título",
+    "prompt": "Prompt",
     "status": "Estado",
     "priority": "Prioridad",
     "assignee": "Asignado",
     "assigneeName": "Nombre del Asignado",
     "storyPoints": "Puntos de Historia",
-    "tags": "Etiquetas",
+
     "prompt": "Prompt",
     "isBlocked": "Bloqueado",
     "blockedReason": "Razón del Bloqueo",
