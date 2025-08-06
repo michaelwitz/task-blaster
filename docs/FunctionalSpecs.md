@@ -5,6 +5,7 @@ The following functional specifications are intended to outline all key requirem
 ## Features Overview
 
 1. **Kanban Board**
+
    - Drag-and-drop task management across multiple columns (Todo, In Progress, In Review, Done)
    - Auto-generated, human-readable task identifiers for easy reference
    - Task lifecycle tracking with automatic timestamps for task creation, start, and completion dates
@@ -15,16 +16,24 @@ The following functional specifications are intended to outline all key requirem
      - Optimizes performance by minimizing database writes during reordering operations
 
 2. **Project Management**
+
    - Create and manage multiple projects with team leaders and unique codes
    - Assign tasks to team members with type-ahead search
 
 3. **Rich User Experience**
+
    - Image Attachments: Upload, view, and delete images attached to tasks
    - Markdown Support: Rich text descriptions for tasks with formatting toolbar
    - Real-time Updates: Optimistic UI updates with persistent database storage
    - Responsive Design: Adaptable UI for various screen sizes
    - Dark/Light Theme: User-selectable themes for better experience
    - Keyboard Navigation: Full keyboard accessibility
+   - **Internationalization (i18n)**: Multi-language support with browser locale detection
+     - **Supported Languages**: English, Spanish, French, German
+     - **Automatic Detection**: Uses browser language settings with fallback to English
+     - **User Preference**: Remembers language choice in localStorage
+     - **Enum Translations**: Database values (TO_DO, IN_PROGRESS) display as translated text
+     - **Consistent Patterns**: camelCase translation keys, nested organization by feature
 
 4. **Image Management System**
    - **Multiple Attachments**: Each task can have multiple image attachments
@@ -36,8 +45,8 @@ The following functional specifications are intended to outline all key requirem
    - **Thumbnail Generation**: Automatic thumbnail creation for preview purposes
    - **Storage Flexibility**: `storage_type` field supports seamless migration from local to cloud storage
    - **Access Control**: Images inherit task access permissions
-   
 5. **Tag System**
+
    - Task Categorization: Tags provide metadata and additional context for tasks
    - Tag Format: Tags must be lowercase with only hyphens (-) as separators
    - Tag Validation: Tags cannot start or end with a hyphen
@@ -51,13 +60,15 @@ The following functional specifications are intended to outline all key requirem
 
 6. **Data Formatting Standards**
    - **Keyword Values**: All keyword/enum values (status, priority, etc.) must use ENUM_CASE format
-   - **Status Values**: "TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE" 
+   - **Status Values**: "TO_DO", "IN_PROGRESS", "IN_REVIEW", "DONE"
    - **Priority Values**: "LOW", "MEDIUM", "HIGH", "CRITICAL"
    - **Tags**: Exception to ENUM_CASE - tags use lowercase-with-hyphens format (e.g., "user-management")
    - **Consistency**: All seed data, validation schemas, and API responses must follow these standards
    - **Database Storage**: Keywords stored as ENUM_CASE values in database for consistency
    - **API Validation**: Server-side validation enforces proper keyword formats
-   
+   - **UI Display**: Enum values are translated to user-friendly text in the interface
+     - Database stores: `TO_DO`, `IN_PROGRESS`, `HIGH`
+     - UI displays: `"To Do"`, `"En Progreso"`, `"Alta"` (based on user's language)
 7. **Development & Testing**
    - Comprehensive API documentation and testing coverage
    - Proper error handling and user feedback
@@ -70,16 +81,20 @@ The following functional specifications are intended to outline all key requirem
 - **Containerization**: Utilize Docker and Docker Compose
 
 ### Database
+
 - **Schema**: Maintain existing database schema and relationships
 - **ORM**: Drizzle ORM for database operations
 
 ### API
+
 - **Development**: API-first approach, with endpoints to cover all functional areas
 - **Port**: APIs served on port 3030
 
 ## User Roles & Permissions
+
 - **Admin**: Full project and user management capabilities
 - **Member**: Task assignment and project participation
 
 ## Licensing
+
 - **ISC License**: Adhere to ISC licensing for all development work

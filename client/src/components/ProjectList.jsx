@@ -1,13 +1,16 @@
 import { Table, Text, Badge, Group } from '@mantine/core';
 import { IconCalendar } from '@tabler/icons-react';
+import { useTranslation } from '../hooks/useTranslation.js';
 
 export function ProjectList({ projects, loading, onProjectSelect }) {
+  const { t } = useTranslation();
+  
   if (loading) {
-    return <Text>Loading projects...</Text>;
+    return <Text>{t('common.loading')}</Text>;
   }
 
   if (!projects || projects.length === 0) {
-    return <Text>No projects found.</Text>;
+    return <Text>{t('projects.noProjects')}</Text>;
   }
 
   const formatDate = (dateString) => {
@@ -18,9 +21,9 @@ export function ProjectList({ projects, loading, onProjectSelect }) {
     <Table>
       <Table.Thead>
         <Table.Tr>
-          <Table.Th>Title</Table.Th>
-          <Table.Th>Leader</Table.Th>
-          <Table.Th>Created</Table.Th>
+          <Table.Th>{t('tasks.title')}</Table.Th>
+          <Table.Th>{t('projects.leader')}</Table.Th>
+          <Table.Th>{t('projects.createdAt')}</Table.Th>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
