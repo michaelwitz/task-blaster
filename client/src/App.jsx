@@ -6,7 +6,15 @@ import {
   Text, 
   Group, 
   Flex, 
-  Menu
+  Menu,
+  Modal, 
+  TextInput, 
+  Textarea, 
+  Select, 
+  NumberInput, 
+  MultiSelect, 
+  Button, 
+  Stack
 } from '@mantine/core';
 import { createTheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -15,7 +23,8 @@ import {
   IconMoon, 
   IconDashboard, 
   IconMenu2, 
-  IconKey
+  IconKey,
+  IconPlus
 } from '@tabler/icons-react';
 import { TokenModal } from './components/TokenModal.jsx';
 import { HomePage } from './pages/HomePage.jsx';
@@ -32,6 +41,15 @@ function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [currentPage, setCurrentPage] = useState('home'); // 'home' or 'kanban'
   const [opened, { open, close }] = useDisclosure(false);
+  const [createTaskModalOpened, setCreateTaskModalOpened] = useState(false);
+  const [newTask, setNewTask] = useState({
+    title: '',
+    description: '',
+    priority: 'MEDIUM',
+    assigneeId: null,
+    storyPoints: null,
+    tags: []
+  });
 
   // Fetch projects with a specific token
   const fetchProjectsWithToken = async (token) => {
@@ -101,9 +119,48 @@ function App() {
   };
 
   const handleProjectSelect = (project) => {
+    console.log('App handleProjectSelect called with:', project);
     setSelectedProject(project);
     setCurrentPage('kanban');
+    console.log('Current page set to:', 'kanban');
   };
+
+  const handleProjectEdit = (project) => {
+    console.log('App handleProjectEdit called with:', project);
+    // TODO: Implement project editing in a separate feature branch
+    alert(`Edit project: ${project.title}`);
+  };
+
+  const handleCreateTask = () => {
+    setCreateTaskModalOpened(true);
+  };
+
+  const handleCreateTaskSubmit = () => {
+    // This will be implemented in the next feature branch
+    console.log('Creating task:', newTask);
+    setCreateTaskModalOpened(false);
+    setNewTask({
+      title: '',
+      description: '',
+      priority: 'MEDIUM',
+      assigneeId: null,
+      storyPoints: null,
+      tags: []
+    });
+  };
+
+  // Keyboard shortcut for creating new task (Ctrl/Cmd + N)
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'n' && currentPage === 'kanban') {
+        event.preventDefault();
+        setCreateTaskModalOpened(true);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [currentPage]);
 
   const handleBackToProjects = () => {
     setSelectedProject(null);
@@ -116,6 +173,7 @@ function App() {
 
   // Render current page
   const renderCurrentPage = () => {
+    console.log('renderCurrentPage called, currentPage:', currentPage, 'selectedProject:', selectedProject);
     if (currentPage === 'kanban') {
       return (
         <KanbanPage 
@@ -131,6 +189,7 @@ function App() {
         loading={loading}
         accessToken={accessToken}
         onProjectSelect={handleProjectSelect}
+        onProjectEdit={handleProjectEdit}
       />
     );
   };
@@ -157,11 +216,27 @@ function App() {
                   >
                     {t('common.setAccessToken')}
                   </Menu.Item>
+                  
+                  {currentPage === 'kanban' && (
+                    <>
+                      <Menu.Divider />
+                      <Menu.Label>{t('tasks.title')}</Menu.Label>
+                      <Menu.Item 
+                        leftSection={<IconPlus size={14} />}
+                        onClick={handleCreateTask}
+                        title={`${t('common.keyboardShortcut')}: Ctrl+N / Cmd+N`}
+                      >
+                        {t('tasks.createTask')}
+                      </Menu.Item>
+                    </>
+                  )}
                 </Menu.Dropdown>
               </Menu>
               
               <IconDashboard size={24} stroke={1.5} />
-              <Text size="lg" fw={700}>Task Blaster</Text>
+              <Text size="lg" fw={700}>
+                {currentPage === 'kanban' && selectedProject ? selectedProject.title : 'Task Blaster'}
+              </Text>
             </Group>
             
             <ActionIcon 
@@ -187,6 +262,74 @@ function App() {
         onClose={close} 
         onSetToken={handleSetToken} 
       />
+
+      {/* Create Task Modal */}
+      <Modal 
+        opened={createTaskModalOpened} 
+        onClose={() => setCreateTaskModalOpened(false)}
+        title={t('tasks.createTask')}
+        size="lg"
+      >
+        <Stack gap="md">
+          <TextInput
+            label={t('tasks.title')}
+            placeholder={t('tasks.title')}
+            value={newTask.title}
+            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+            required
+          />
+          
+          <Textarea
+            label={t('tasks.description')}
+            placeholder={t('tasks.description')}
+            value={newTask.description}
+            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+            rows={3}
+          />
+          
+          <Select
+            label={t('tasks.priority')}
+            data={[
+              { value: 'LOW', label: t('tasks.priorities.LOW') },
+              { value: 'MEDIUM', label: t('tasks.priorities.MEDIUM') },
+              { value: 'HIGH', label: t('tasks.priorities.HIGH') },
+              { value: 'CRITICAL', label: t('tasks.priorities.CRITICAL') }
+            ]}
+            value={newTask.priority}
+            onChange={(value) => setNewTask({ ...newTask, priority: value })}
+          />
+          
+          <NumberInput
+            label={t('tasks.storyPoints')}
+            placeholder={t('tasks.storyPoints')}
+            value={newTask.storyPoints}
+            onChange={(value) => setNewTask({ ...newTask, storyPoints: value })}
+            min={1}
+            max={21}
+          />
+          
+          <MultiSelect
+            label={t('tasks.tags')}
+            placeholder={t('tasks.tags')}
+            data={['setup', 'configuration', 'database', 'design', 'auth', 'security', 'documentation', 'api']}
+            value={newTask.tags}
+            onChange={(value) => setNewTask({ ...newTask, tags: value })}
+            searchable
+            creatable
+            getCreateLabel={(query) => `+ Create ${query}`}
+            onCreate={(query) => query}
+          />
+          
+          <Group justify="flex-end" mt="md">
+            <Button variant="subtle" onClick={() => setCreateTaskModalOpened(false)}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={handleCreateTaskSubmit}>
+              {t('tasks.createTask')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       {/* Debug info - remove in production */}
       <div style={{ 

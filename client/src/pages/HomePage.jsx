@@ -3,7 +3,7 @@ import { IconAlertCircle } from '@tabler/icons-react';
 import { ProjectList } from '../components/ProjectList.jsx';
 import { useTranslation } from '../hooks/useTranslation.js';
 
-export function HomePage({ projects, loading, accessToken, onProjectSelect }) {
+export function HomePage({ projects, loading, accessToken, onProjectSelect, onProjectEdit }) {
   const { t } = useTranslation();
 
   if (!accessToken) {
@@ -27,6 +27,7 @@ export function HomePage({ projects, loading, accessToken, onProjectSelect }) {
         projects={projects} 
         loading={loading} 
         onProjectSelect={onProjectSelect}
+        onProjectEdit={onProjectEdit}
       />
     </Container>
   );
