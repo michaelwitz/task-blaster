@@ -1,7 +1,11 @@
 import { userSchemas } from '../schemas/validation.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 export default async function userRoutes(fastify, options) {
   const { dbService } = options;
+
+  // Add authentication middleware to all user routes
+  fastify.addHook('preHandler', authMiddleware);
 
   // GET /users - List all users with optional search
   fastify.get('/users', {
@@ -10,6 +14,14 @@ export default async function userRoutes(fastify, options) {
     try {
       const { search } = request.query;
       const users = await dbService.getUsers(search);
+      
+      // Log the authenticated user making the request
+      fastify.log.info({
+        authenticatedUser: request.user,
+        action: 'get_users',
+        searchTerm: search
+      });
+      
       reply.send(users);
     } catch (error) {
       fastify.log.error(error);

@@ -1,5 +1,10 @@
+import { authMiddleware } from '../middleware/authMiddleware.js';
+
 export default async function imageRoutes(fastify, options) {
   const { dbService } = options;
+
+  // Add authentication middleware to all image routes
+  fastify.addHook('preHandler', authMiddleware);
 
   // GET /tasks/:taskId/images - Get all images for a task
   fastify.get('/tasks/:taskId/images', async (request, reply) => {

@@ -1,8 +1,12 @@
 import { taskSchemas } from '../schemas/validation.js';
 import { applyGitStatus } from '../services/gitStatus.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 export default async function taskRoutes(fastify, options) {
   const { dbService } = options;
+
+  // Add authentication middleware to all task routes
+  fastify.addHook('preHandler', authMiddleware);
 
   // GET /tasks - List all tasks with filters
   fastify.get('/tasks', {

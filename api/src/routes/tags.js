@@ -1,7 +1,11 @@
 import { tagSchemas } from '../schemas/validation.js';
+import { authMiddleware } from '../middleware/authMiddleware.js';
 
 export default async function tagRoutes(fastify, options) {
   const { dbService } = options;
+
+  // Add authentication middleware to all tag routes
+  fastify.addHook('preHandler', authMiddleware);
 
   // GET /tags - List all tags with usage counts
   fastify.get('/tags', {
