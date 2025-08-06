@@ -157,6 +157,7 @@
   - Agent will provide comprehensive PR descriptions when work is complete
   - Agent can create PRs directly on GitHub (with provided access token)
   - Project lead reviews and approves PRs
+  - **PR Text Format**: Do not use any special characters in PR titles or descriptions - use plain text only
 - **Branch Protection**: Main branch is protected and requires PR approval
 - **Commit Standards**: Follow conventional commit format (feat:, fix:, docs:, etc.)
 
