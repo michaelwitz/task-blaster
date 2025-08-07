@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_DB: task_blaster_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
     ports:
       - "5433:5432"  # Using 5433 to avoid conflict with existing containers
     volumes:
@@ -28,7 +28,7 @@ services:
     ports:
       - "3030:3030"
     environment:
-      DATABASE_URL: postgres://postgres:password@postgres:5432/task_blaster_db
+      DATABASE_URL: postgres://postgres:${POSTGRES_PASSWORD:-password}@postgres:5432/task_blaster_db
       NODE_ENV: development
       PORT: 3030
     volumes:
