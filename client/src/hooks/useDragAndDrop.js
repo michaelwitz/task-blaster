@@ -15,7 +15,18 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
 
     // Determine target column
     const overTask = tasks.find(task => task.id === over.id);
-    const targetColumn = overTask ? overTask.status : over.id;
+    let targetColumn;
+    let isDroppingOnColumn = false;
+    
+    if (overTask) {
+      // Dropping on a specific task
+      targetColumn = overTask.status;
+      isDroppingOnColumn = false;
+    } else {
+      // Dropping on the column itself (over.id is the column status)
+      targetColumn = over.id;
+      isDroppingOnColumn = true;
+    }
 
     try {
       const token = localStorage.getItem('TB_TOKEN');
@@ -30,7 +41,15 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
         
         const columnTasks = getTasksByStatus(targetColumn);
         const currentIndex = columnTasks.findIndex(t => t.id === active.id);
-        const overIndex = columnTasks.findIndex(t => t.id === over.id);
+        
+        let overIndex;
+        if (isDroppingOnColumn) {
+          // Dropping on the column itself - put at the end
+          overIndex = columnTasks.length;
+        } else {
+          // Dropping on a specific task
+          overIndex = columnTasks.findIndex(t => t.id === over.id);
+        }
         
         // Create new order with dragged task at target position
         const newOrder = [...columnTasks];
@@ -62,14 +81,14 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
         // Different status - moving between columns
         console.log(`Moving task ${active.id} from ${activeTask.status} to ${targetColumn}`);
         
-        const response = await fetch(`http://localhost:3030/tasks/${active.id}`, {
-          method: 'PUT',
+        // Use the dedicated status change API
+        const response = await fetch(`http://localhost:3030/tasks/${active.id}/status`, {
+          method: 'PATCH',
           headers: {
             'TB_TOKEN': token,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            ...activeTask,
             status: targetColumn
           })
         });

@@ -96,6 +96,64 @@ export default async function taskRoutes(fastify, options) {
     }
   });
 
+  // PATCH /tasks/:id/status - Change task status
+  fastify.patch('/tasks/:id/status', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: { type: 'string', pattern: '^\\d+$' }
+        }
+      },
+      body: {
+        type: 'object',
+        required: ['status'],
+        properties: {
+          status: { 
+            type: 'string', 
+            enum: ['TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE'] 
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const { id } = request.params;
+      const { status } = request.body;
+      
+      // Get current task
+      const currentTask = await dbService.getTaskById(parseInt(id));
+      if (!currentTask) {
+        return reply.code(404).send({ error: 'Task not found' });
+      }
+      
+      // Get tasks in target column to determine position
+      const targetColumnTasks = await dbService.getTasks({ 
+        projectId: currentTask.projectId, 
+        status 
+      });
+      
+      // Calculate new position (at the bottom of the column)
+      const newPosition = targetColumnTasks.length > 0 ? 
+        Math.max(...targetColumnTasks.map(t => t.position || 0)) + 10 : 10;
+      
+      // Update task with new status and position
+      const updatedTask = await dbService.updateTask(parseInt(id), {
+        ...currentTask,
+        status,
+        position: newPosition,
+        updatedAt: new Date()
+      });
+      
+      request.log.info(`Task ${id} status changed from ${currentTask.status} to ${status}`);
+      reply.send(updatedTask);
+    } catch (error) {
+      request.log.error(error, 'Failed to change task status');
+      reply.code(500).send({ error: 'Failed to change task status' });
+    }
+  });
+
   // DELETE /tasks/:id - Delete task
   fastify.delete('/tasks/:id', {
     schema: taskSchemas.deleteTask
