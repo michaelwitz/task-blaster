@@ -43,8 +43,8 @@ This application uses Docker Compose for easy local development. The setup inclu
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/michaelwitz/task-blaster.git
-cd task-blaster
+git clone https://github.com/michaelwitz/task-blaster-oss.git
+cd task-blaster-oss
 ```
 
 ### Step 2: Environment Configuration
@@ -354,7 +354,7 @@ For enterprise features and support, contact us about the paid subscription vers
 ### Monorepo Structure
 
 ```
-task-blaster/
+task-blaster-oss/
 ├── api/                 # Fastify API server
 │   ├── lib/db/         # Database schema and migrations
 │   ├── src/            # API source code
