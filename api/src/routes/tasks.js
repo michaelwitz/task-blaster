@@ -108,12 +108,16 @@ export default async function taskRoutes(fastify, options) {
         return reply.code(404).send({ error: 'Task not found' });
       }
       
-      reply.send({ message: 'Task deleted successfully', task });
+      reply.send({ message: 'Task deleted successfully' });
     } catch (error) {
       fastify.log.error(error);
       reply.code(500).send({ error: 'Failed to delete task' });
     }
   });
+
+
+
+
 
   // PATCH /tasks/:id/reorder - Reorder task position
   fastify.patch('/tasks/:id/reorder', {

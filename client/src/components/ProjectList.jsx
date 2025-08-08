@@ -1,9 +1,20 @@
 import { Table, Text, Badge, Group, ActionIcon } from '@mantine/core';
 import { IconCalendar, IconEdit } from '@tabler/icons-react';
 import { useTranslation } from '../hooks/useTranslation.js';
+import { useEffect } from 'react';
 
 export function ProjectList({ projects, loading, onProjectSelect, onProjectEdit }) {
   const { t } = useTranslation();
+  
+  // Debug info when project list renders
+  useEffect(() => {
+    if (!loading && projects) {
+      console.log('=== PROJECTS DEBUG ===');
+      console.log('Projects:', projects.length);
+      console.log('LOCALE:', navigator.language);
+      console.log('=====================');
+    }
+  }, [projects, loading]);
   
   if (loading) {
     return <Text>{t('common.loading')}</Text>;
@@ -14,7 +25,13 @@ export function ProjectList({ projects, loading, onProjectSelect, onProjectEdit 
   }
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString();
+    const locale = navigator.language;
+    console.log('LOCALE:', locale);
+    return new Date(dateString).toLocaleDateString(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
   };
 
   return (
@@ -43,7 +60,6 @@ export function ProjectList({ projects, loading, onProjectSelect, onProjectEdit 
                   cursor: 'pointer'
                 }}
                 onClick={() => {
-                  console.log('Project title clicked:', project);
                   onProjectSelect(project);
                 }}
               >
@@ -67,7 +83,6 @@ export function ProjectList({ projects, loading, onProjectSelect, onProjectEdit 
                 size="md"
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('Edit project clicked:', project);
                   onProjectEdit(project);
                 }}
               >

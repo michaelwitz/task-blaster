@@ -14,7 +14,7 @@ export async function seedTasks() {
         status: 'TO_DO',
         priority: 'HIGH',
         assignee_id: 2,
-        position: 1
+        position: 10
       },
       { 
         project_id: 1, 
@@ -24,7 +24,7 @@ export async function seedTasks() {
         status: 'IN_PROGRESS',
         priority: 'MEDIUM',
         assignee_id: 1,
-        position: 2
+        position: 20
       },
       { 
         project_id: 2, 
@@ -34,7 +34,7 @@ export async function seedTasks() {
         status: 'DONE',
         priority: 'HIGH',
         assignee_id: 3,
-        position: 1
+        position: 10
       },
       { 
         project_id: 2, 
@@ -44,7 +44,7 @@ export async function seedTasks() {
         status: 'TO_DO',
         priority: 'MEDIUM',
         assignee_id: 2,
-        position: 2
+        position: 20
       },
       { 
         project_id: 3, 
@@ -54,7 +54,58 @@ export async function seedTasks() {
         status: 'IN_PROGRESS',
         priority: 'HIGH',
         assignee_id: 4,
-        position: 1
+        position: 10
+      },
+      // Additional tasks for API Modernization project
+      { 
+        project_id: 3, 
+        task_id: 'APIMOD-2', 
+        title: 'Design new REST API architecture', 
+        prompt: 'Create comprehensive API design with OpenAPI specification',
+        status: 'TO_DO',
+        priority: 'CRITICAL',
+        assignee_id: 3,
+        position: 20
+      },
+      { 
+        project_id: 3, 
+        task_id: 'APIMOD-3', 
+        title: 'Implement authentication middleware', 
+        prompt: 'Build JWT-based authentication system for API endpoints',
+        status: 'TO_DO',
+        priority: 'HIGH',
+        assignee_id: 1,
+        position: 30
+      },
+      { 
+        project_id: 3, 
+        task_id: 'APIMOD-4', 
+        title: 'Create database migration scripts', 
+        prompt: 'Develop scripts to migrate existing data to new schema',
+        status: 'IN_REVIEW',
+        priority: 'MEDIUM',
+        assignee_id: 2,
+        position: 40
+      },
+      { 
+        project_id: 3, 
+        task_id: 'APIMOD-5', 
+        title: 'Write API documentation', 
+        prompt: 'Create comprehensive documentation with examples',
+        status: 'DONE',
+        priority: 'LOW',
+        assignee_id: 4,
+        position: 10
+      },
+      { 
+        project_id: 3, 
+        task_id: 'APIMOD-6', 
+        title: 'Performance testing and optimization', 
+        prompt: 'Conduct load testing and optimize API response times',
+        status: 'TO_DO',
+        priority: 'MEDIUM',
+        assignee_id: 1,
+        position: 40
       }
     ]);
     

@@ -136,11 +136,19 @@ export const taskSchemas = {
         description: { type: 'string', maxLength: 5000 },
         status: { type: 'string', enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] },
         priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] },
-        dueDate: { type: 'string', format: 'date-time', nullable: true },
+        storyPoints: { type: 'integer', minimum: 1, maximum: 21, nullable: true },
         assigneeId: { type: 'integer', minimum: 1, nullable: true },
+        prompt: { type: 'string', maxLength: 10000 },
+        isBlocked: { type: 'boolean' },
+        blockedReason: { type: 'string', maxLength: 1000 },
+        gitFeatureBranch: { type: 'string', maxLength: 255 },
+        gitPullRequestUrl: { type: 'string', maxLength: 500 },
         position: { type: 'integer', minimum: 0 },
-        git_feature_branch: { type: 'string', maxLength: 255 },
-        git_pull_request_url: { type: 'string', maxLength: 500 }
+        tagNames: {
+          type: 'array',
+          items: { type: 'string', pattern: tagNamePattern },
+          uniqueItems: true
+        }
       },
       additionalProperties: false
     }

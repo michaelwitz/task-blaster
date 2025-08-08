@@ -98,11 +98,120 @@ export default async function projectRoutes(fastify, options) {
       const { id } = request.params;
       const { status, priority } = request.query;
       
-      const tasks = await dbService.getTasksForProject(parseInt(id), { status, priority });
+      const filters = {
+        projectId: parseInt(id),
+        status,
+        priority
+      };
+      
+      const tasks = await dbService.getTasks(filters);
       reply.send(tasks);
     } catch (error) {
       fastify.log.error(error);
       reply.code(500).send({ error: 'Failed to fetch project tasks' });
+    }
+  });
+
+  // GET /projects/:id/kanban/tasks/column/:status - Get column positions for a specific status
+  fastify.get('/projects/:id/kanban/tasks/column/:status', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id', 'status'],
+        properties: {
+          id: { type: 'string', pattern: '^\\d+$' },
+          status: { type: 'string', enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const { id, status } = request.params;
+      const projectId = parseInt(id);
+      
+      const columnTasks = await dbService.getColumnPositions(projectId, status);
+      reply.send(columnTasks);
+    } catch (error) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: 'Failed to fetch column positions' });
+    }
+  });
+
+  // PATCH /projects/:id/kanban/tasks/column/:status/positions - Update multiple task positions in a column
+  fastify.patch('/projects/:id/kanban/tasks/column/:status/positions', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id', 'status'],
+        properties: {
+          id: { type: 'string', pattern: '^\\d+$' },
+          status: { type: 'string', enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] }
+        }
+      },
+      body: {
+        type: 'object',
+        required: ['positionUpdates'],
+        properties: {
+          positionUpdates: {
+            type: 'array',
+            items: {
+              type: 'object',
+              required: ['taskId', 'newPosition'],
+              properties: {
+                taskId: { type: 'number' },
+                newPosition: { type: 'number' }
+              }
+            }
+          }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const { id, status } = request.params;
+      const { positionUpdates } = request.body;
+      const projectId = parseInt(id);
+      
+      const updatedTasks = await dbService.updateColumnPositions(projectId, status, positionUpdates);
+      reply.send(updatedTasks);
+    } catch (error) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: 'Failed to update column positions' });
+    }
+  });
+
+  // PATCH /projects/:id/kanban/tasks/:taskId/position - Update single task position
+  fastify.patch('/projects/:id/kanban/tasks/:taskId/position', {
+    schema: {
+      params: {
+        type: 'object',
+        required: ['id', 'taskId'],
+        properties: {
+          id: { type: 'string', pattern: '^\\d+$' },
+          taskId: { type: 'string', pattern: '^\\d+$' }
+        }
+      },
+      body: {
+        type: 'object',
+        required: ['newPosition', 'status'],
+        properties: {
+          newPosition: { type: 'number' },
+          status: { type: 'string', enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] }
+        }
+      }
+    }
+  }, async (request, reply) => {
+    try {
+      const { id, taskId } = request.params;
+      const { newPosition, status } = request.body;
+      const projectId = parseInt(id);
+      const taskIdNum = parseInt(taskId);
+      
+      const updatedTask = await dbService.updateTaskPosition(taskIdNum, newPosition, status);
+      reply.send(updatedTask);
+    } catch (error) {
+      fastify.log.error(error);
+      reply.code(500).send({ error: 'Failed to update task position' });
     }
   });
 }
