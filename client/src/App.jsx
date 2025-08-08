@@ -33,9 +33,10 @@ import { HomePage } from './pages/HomePage.jsx';
 import { KanbanPage } from './pages/KanbanPage.jsx';
 import { useTranslation } from './hooks/useTranslation.js';
 import '@mantine/core/styles.css';
+import './i18n/index.js';
 
 function AppContent() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -60,14 +61,26 @@ function AppContent() {
     tags: []
   });
 
+  // Map language codes to proper locale codes for date formatting
+  const getLocaleCode = (language) => {
+    switch (language) {
+      case 'es': return 'es-ES';
+      case 'fr': return 'fr-FR';
+      case 'de': return 'de-DE';
+      default: return 'en-US';
+    }
+  };
+
   // Fetch projects with a specific token
   const fetchProjectsWithToken = async (token) => {
-    console.log('fetchProjectsWithToken called with:', token);
-    if (!token) return;
+    if (!token) {
+      console.error('No access token provided');
+      return;
+    }
 
     setLoading(true);
+    
     try {
-      console.log('Fetching projects from API...');
       const response = await fetch('http://localhost:3030/projects', {
         method: 'GET',
         headers: {
@@ -76,13 +89,16 @@ function AppContent() {
         }
       });
       
-      console.log('API response status:', response.status);
-      console.log('API response headers:', response.headers);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('Projects fetched:', data);
         setProjects(data);
+        // Debug info
+        console.log('Token: Set');
+        console.log('localStorage: Has token');
+        console.log('Projects:', data.length);
+        console.log('TEST navigator:', navigator);
+        console.log('TEST navigator.language:', navigator.language);
+        console.log('BROWSER LOCALE:', navigator.language);
       } else {
         const errorText = await response.text();
         console.error('Failed to fetch projects:', response.status, errorText);
@@ -108,6 +124,18 @@ function AppContent() {
       // Auto-load projects if token exists
       fetchProjectsWithToken(savedToken);
     }
+    
+    // Debug info on app load
+    console.log('=== APP DEBUG ===');
+    console.log('TEST: useEffect is running');
+    console.log('Token:', savedToken ? 'Set' : 'Not set');
+    console.log('localStorage:', savedToken ? 'Has token' : 'No token');
+    console.log('URL:', window.location.pathname);
+    console.log('isKanbanPage:', window.location.pathname.includes('/kanban'));
+    console.log('selectedProject:', selectedProject?.title || 'null');
+    console.log('projectCode:', projectCode || 'null');
+    console.log('BROWSER LOCALE:', navigator.language);
+    console.log('==================');
   }, []);
 
   const toggleTheme = () => {
@@ -117,24 +145,19 @@ function AppContent() {
   };
 
   const handleSetToken = (token) => {
-    console.log('App handleSetToken called with:', token);
     setAccessToken(token);
     localStorage.setItem('TB_TOKEN', token);
-    console.log('Token saved to localStorage');
     close();
-    console.log('Modal closed, fetching projects...');
     // Auto-load projects after setting token
     fetchProjectsWithToken(token);
   };
 
   const handleProjectSelect = (project) => {
-    console.log('App handleProjectSelect called with:', project);
     setSelectedProject(project);
     navigate(`/projects/${project.code}/kanban`);
   };
 
   const handleProjectEdit = (project) => {
-    console.log('App handleProjectEdit called with:', project);
     // TODO: Implement project editing in a separate feature branch
     alert(`Edit project: ${project.title}`);
   };
@@ -145,7 +168,6 @@ function AppContent() {
 
     const handleCreateTaskSubmit = () => {
     // This will be implemented in the next feature branch
-    console.log('Creating task:', newTask);
     setCreateTaskModalOpened(false);
     
     // Convert tag strings to tag objects with colors
@@ -154,8 +176,6 @@ function AppContent() {
       name: tagName,
       color: tagColors[index % tagColors.length]
     }));
-    
-    console.log('Tags with colors:', tagsWithColors);
     
     setNewTask({
       title: '',
@@ -430,6 +450,7 @@ function AppContent() {
         <div>isKanbanPage: {isKanbanPage ? 'true' : 'false'}</div>
         <div>selectedProject: {selectedProject ? selectedProject.title : 'null'}</div>
         <div>projectCode: {projectCode || 'null'}</div>
+        <div>LOCALE: {navigator.language}</div>
       </div>
     </MantineProvider>
   );

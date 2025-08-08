@@ -158,6 +158,29 @@ class DatabaseService {
   }
 
   /**
+   * Get project by code
+   */
+  async getProjectByCode(code) {
+    const [project] = await db.select({
+      id: PROJECTS.id,
+      title: PROJECTS.title,
+      code: PROJECTS.code,
+      description: PROJECTS.description,
+      leaderId: PROJECTS.leader_id,
+      leaderName: USERS.full_name,
+      leaderEmail: USERS.email,
+      createdAt: PROJECTS.created_at,
+      updatedAt: PROJECTS.updated_at
+    })
+    .from(PROJECTS)
+    .leftJoin(USERS, eq(PROJECTS.leader_id, USERS.id))
+    .where(eq(PROJECTS.code, code))
+    .limit(1);
+
+    return project || null;
+  }
+
+  /**
    * Create new project
    */
   async createProject(projectData) {
@@ -253,7 +276,7 @@ class DatabaseService {
     .from(TASKS)
     .leftJoin(USERS, eq(TASKS.assignee_id, USERS.id))
     .where(eq(TASKS.project_id, projectId))
-    .orderBy(asc(TASKS.position));
+    .orderBy(asc(TASKS.status), asc(TASKS.position));
 
     // Get tags for each task
     const tasksWithTags = await Promise.all(
@@ -374,6 +397,45 @@ class DatabaseService {
   }
 
   /**
+   * Get task by task_id (project code + sequence) with full details
+   */
+  async getTaskByTaskId(taskId) {
+    const [task] = await db.select({
+      id: TASKS.id,
+      taskId: TASKS.task_id,
+      title: TASKS.title,
+      status: TASKS.status,
+      priority: TASKS.priority,
+      position: TASKS.position,
+      storyPoints: TASKS.story_points,
+      projectId: TASKS.project_id,
+      projectName: PROJECTS.title,
+      assigneeId: TASKS.assignee_id,
+      assigneeName: USERS.full_name,
+      assigneeEmail: USERS.email,
+      prompt: TASKS.prompt,
+      isBlocked: TASKS.is_blocked,
+      blockedReason: TASKS.blocked_reason,
+      gitFeatureBranch: TASKS.git_feature_branch,
+      gitPullRequestUrl: TASKS.git_pull_request_url,
+      startedAt: TASKS.started_at,
+      completedAt: TASKS.completed_at,
+      createdAt: TASKS.created_at,
+      updatedAt: TASKS.updated_at
+    })
+    .from(TASKS)
+    .leftJoin(PROJECTS, eq(TASKS.project_id, PROJECTS.id))
+    .leftJoin(USERS, eq(TASKS.assignee_id, USERS.id))
+    .where(eq(TASKS.task_id, taskId))
+    .limit(1);
+
+    if (!task) return null;
+
+    const tags = await this.getTagsForTask(task.id);
+    return { ...task, tags };
+  }
+
+  /**
    * Create new task with auto-generated task_id and proper positioning
    */
   async createTask(taskData) {
@@ -403,9 +465,15 @@ class DatabaseService {
         max: sql`COALESCE(MAX(${TASKS.position}), 0)`.as('max') 
       })
       .from(TASKS)
-      .where(eq(TASKS.project_id, taskData.projectId));
+      .where(
+        and(
+          eq(TASKS.project_id, taskData.projectId),
+          eq(TASKS.status, taskData.status || 'TO_DO')
+        )
+      );
 
-      const nextPosition = maxPosition.max + 1;
+      // Use sparse positioning (count by 10s) to avoid frequent rebalancing
+      const nextPosition = Math.floor(maxPosition.max / 10) * 10 + 10;
       
       // Create the task with auto-generated task_id
       const [newTask] = await tx.insert(TASKS)
@@ -474,50 +542,132 @@ class DatabaseService {
   }
 
   /**
-   * Reorder task position
+   * Update task position and handle related task adjustments
    */
-  async reorderTask(id, newPosition) {
-    const [task] = await db.select()
+  async updateTaskPosition(taskId, newPosition, status) {
+    // Get the current task
+    const [currentTask] = await db.select()
       .from(TASKS)
-      .where(eq(TASKS.id, id))
+      .where(eq(TASKS.id, taskId))
       .limit(1);
 
-    if (!task) return null;
+    if (!currentTask) return null;
 
-    const oldPosition = task.position;
-    const projectId = task.project_id;
+    const oldPosition = currentTask.position;
+    const oldStatus = currentTask.status;
+    const projectId = currentTask.project_id;
 
-    if (newPosition > oldPosition) {
-      // Moving down: decrement positions between old and new
-      await db.update(TASKS)
-        .set({ position: sql`${TASKS.position} - 1` })
-        .where(
-          and(
-            eq(TASKS.project_id, projectId),
-            sql`${TASKS.position} > ${oldPosition}`,
-            sql`${TASKS.position} <= ${newPosition}`
-          )
-        );
-    } else if (newPosition < oldPosition) {
-      // Moving up: increment positions between new and old
-      await db.update(TASKS)
-        .set({ position: sql`${TASKS.position} + 1` })
-        .where(
-          and(
-            eq(TASKS.project_id, projectId),
-            sql`${TASKS.position} >= ${newPosition}`,
-            sql`${TASKS.position} < ${oldPosition}`
-          )
-        );
+    // If status is changing, handle it as a status change
+    if (status !== oldStatus) {
+      // Update the task with new status and position
+      const [updatedTask] = await db.update(TASKS)
+        .set({ 
+          status: status,
+          position: newPosition,
+          updated_at: new Date()
+        })
+        .where(eq(TASKS.id, taskId))
+        .returning();
+
+      return updatedTask;
     }
 
-    // Update the task's position
+    // Same status - handle position change with sparse positioning
+    if (newPosition === oldPosition) {
+      return currentTask; // No change needed
+    }
+
+    // Get all tasks in the same status column for this project
+    const columnTasks = await db.select()
+      .from(TASKS)
+      .where(
+        and(
+          eq(TASKS.project_id, projectId),
+          eq(TASKS.status, status)
+        )
+      )
+      .orderBy(asc(TASKS.position));
+
+    // Find the target position in the sorted list
+    const targetIndex = columnTasks.findIndex(task => task.position >= newPosition);
+    
+    if (targetIndex === -1) {
+      // Inserting at the end
+      const [updatedTask] = await db.update(TASKS)
+        .set({ 
+          position: newPosition,
+          updated_at: new Date()
+        })
+        .where(eq(TASKS.id, taskId))
+        .returning();
+      
+      return updatedTask;
+    }
+
+    // Check if we need to redistribute positions
+    const beforeTask = targetIndex > 0 ? columnTasks[targetIndex - 1] : null;
+    const afterTask = columnTasks[targetIndex];
+    
+    let finalPosition = newPosition;
+    
+    if (beforeTask && afterTask) {
+      const gap = afterTask.position - beforeTask.position;
+      if (gap < 2) {
+        // Need to redistribute - use sparse positioning
+        finalPosition = beforeTask.position + Math.floor(gap / 2);
+        
+        // Redistribute all tasks in this column
+        await this.redistributeColumnPositions(projectId, status);
+      } else {
+        // Enough space, use the calculated position
+        finalPosition = beforeTask.position + Math.floor(gap / 2);
+      }
+    } else if (!beforeTask) {
+      // Inserting at the beginning
+      finalPosition = afterTask.position / 2;
+    } else {
+      // Inserting at the end
+      finalPosition = beforeTask.position + 10;
+    }
+
+    // Update the task position
     const [updatedTask] = await db.update(TASKS)
-      .set({ position: newPosition })
-      .where(eq(TASKS.id, id))
+      .set({ 
+        position: finalPosition,
+        updated_at: new Date()
+      })
+      .where(eq(TASKS.id, taskId))
       .returning();
 
     return updatedTask;
+  }
+
+  /**
+   * Redistribute positions in a column using sparse positioning
+   */
+  async redistributeColumnPositions(projectId, status) {
+    const tasks = await db.select()
+      .from(TASKS)
+      .where(
+        and(
+          eq(TASKS.project_id, projectId),
+          eq(TASKS.status, status)
+        )
+      )
+      .orderBy(asc(TASKS.position));
+
+    // Update all tasks with new sparse positions
+    const updatePromises = tasks.map((task, index) => {
+      const newPosition = (index + 1) * 10;
+      return db.update(TASKS)
+        .set({ 
+          position: newPosition,
+          updated_at: new Date()
+        })
+        .where(eq(TASKS.id, task.id));
+    });
+
+    await Promise.all(updatePromises);
   }
 
   /**
@@ -837,6 +987,83 @@ class DatabaseService {
     } catch (error) {
       throw new Error(`Database connection failed: ${error.message}`);
     }
+  }
+
+  /**
+   * Get column positions for a specific project and status
+   */
+  async getColumnPositions(projectId, status) {
+    const tasks = await db.select({
+      id: TASKS.id,
+      position: TASKS.position
+    })
+    .from(TASKS)
+    .where(
+      and(
+        eq(TASKS.project_id, projectId),
+        eq(TASKS.status, status)
+      )
+    )
+    .orderBy(asc(TASKS.position));
+
+    return tasks;
+  }
+
+  /**
+   * Update multiple task positions in a column (optimized for sparse positioning)
+   */
+  async updateColumnPositions(projectId, status, positionUpdates) {
+    // Update only the tasks that need position changes
+    const updatePromises = positionUpdates.map(({ taskId, newPosition }) => {
+      return db.update(TASKS)
+        .set({ 
+          position: newPosition,
+          updated_at: new Date()
+        })
+        .where(eq(TASKS.id, taskId));
+    });
+
+    await Promise.all(updatePromises);
+
+    // Return updated column positions
+    return await this.getColumnPositions(projectId, status);
+  }
+
+  /**
+   * Calculate optimal positions for sparse positioning
+   */
+  calculateSparsePositions(tasks, insertIndex, insertPosition) {
+    const positions = [];
+    let needsRedistribution = false;
+
+    // Check if we need redistribution
+    for (let i = 0; i < tasks.length - 1; i++) {
+      const gap = tasks[i + 1].position - tasks[i].position;
+      if (gap < 2) {
+        needsRedistribution = true;
+        break;
+      }
+    }
+
+    if (needsRedistribution) {
+      // Redistribute all positions with 10-unit gaps
+      for (let i = 0; i <= tasks.length; i++) {
+        if (i === insertIndex) {
+          positions.push((i + 1) * 10); // Insert position
+        }
+        if (i < tasks.length) {
+          positions.push((i + 2) * 10); // Existing tasks
+        }
+      }
+    } else {
+      // Use existing positions, only update the inserted task
+      for (let i = 0; i < tasks.length; i++) {
+        positions.push(tasks[i].position);
+      }
+      positions.splice(insertIndex, 0, insertPosition);
+    }
+
+    return { positions, needsRedistribution };
   }
 }
 

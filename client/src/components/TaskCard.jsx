@@ -1,9 +1,37 @@
-import { Card, Stack, Text, Flex, Badge, Group, Box } from '@mantine/core';
-import { IconUser, IconCalendar, IconFlame, IconArrowUp, IconSquare, IconArrowDown } from '@tabler/icons-react';
+import { Card, Stack, Text, Flex, Badge, Group, Box, ActionIcon } from '@mantine/core';
+import { IconUser, IconCalendar, IconFlame, IconArrowUp, IconSquare, IconArrowDown, IconEdit, IconLock } from '@tabler/icons-react';
 import { useTranslation } from '../hooks/useTranslation.js';
 
-export function TaskCard({ task, onClick }) {
-  const { translatePriority } = useTranslation();
+export function TaskCard({ task, onEdit }) {
+  const { translatePriority, t, i18n } = useTranslation();
+  
+  // Map language codes to proper locale codes for date formatting
+  const getLocaleCode = (language) => {
+    switch (language) {
+      case 'es': return 'es-ES';
+      case 'fr': return 'fr-FR';
+      case 'de': return 'de-DE';
+      default: return 'en-US';
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const locale = getLocaleCode(i18n.language);
+    console.log('LOCALE DEBUG - i18n.language:', i18n.language, '| Mapped to:', locale);
+    return new Date(dateString).toLocaleDateString(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+
+  const formatTime = (dateString) => {
+    const locale = getLocaleCode(i18n.language);
+    return new Date(dateString).toLocaleTimeString(locale, { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
+  };
 
   const getPriorityColor = (priority) => {
     switch (priority) {
@@ -28,31 +56,62 @@ export function TaskCard({ task, onClick }) {
     }
   };
 
+  const handleEditClick = (e) => {
+    e.stopPropagation();
+    onEdit && onEdit(task);
+  };
+
   return (
     <Card 
       shadow="sm" 
       padding="sm" 
       mb="xs" 
       withBorder
-      style={{ cursor: 'pointer', position: 'relative' }}
-      onClick={() => onClick && onClick(task)}
+      style={{ 
+        position: 'relative',
+        opacity: 1,
+        transform: 'none',
+        transition: 'opacity 0.2s, transform 0.2s',
+        cursor: 'grab'
+      }}
     >
-      {/* Priority icon in top right corner */}
+      {/* Priority icon and edit button in top right corner */}
       <Box
         style={{
           position: 'absolute',
           top: '8px',
           right: '8px',
-          zIndex: 1
+          zIndex: 1,
+          display: 'flex',
+          gap: '4px'
         }}
-        title={translatePriority(task.priority)} // Show priority on hover
       >
-        {getPriorityIcon(task.priority)}
+        <Box
+          title={translatePriority(task.priority)} // Show priority on hover
+        >
+          {getPriorityIcon(task.priority)}
+        </Box>
+        <ActionIcon
+          variant="filled"
+          size="xs"
+          onClick={handleEditClick}
+          title="Edit task"
+          style={{ 
+            opacity: 0.8,
+            backgroundColor: 'var(--mantine-color-blue-6)',
+            color: 'white'
+          }}
+        >
+          <IconEdit size={12} />
+        </ActionIcon>
       </Box>
       
       <Stack gap="xs">
         <Text size="sm" fw={500} lineClamp={2} pr="20px"> {/* Add padding to avoid icon overlap */}
           {task.title}
+          {task.isBlocked && (
+            <IconLock size={12} style={{ marginLeft: '4px', color: 'red' }} />
+          )}
         </Text>
         
         {/* Story Points badge only */}
@@ -67,7 +126,7 @@ export function TaskCard({ task, onClick }) {
         {task.assigneeName && (
           <Group gap="xs">
             <IconUser size={12} />
-            <Text size="xs">{task.assigneeName}</Text>
+            <Text size="xs">{t('tasks.assignee')}: {task.assigneeName}</Text>
           </Group>
         )}
         
@@ -83,7 +142,7 @@ export function TaskCard({ task, onClick }) {
                   border: 'none'
                 }}
               >
-                {tag.name}
+                {tag.tag}
               </Badge>
             ))}
             {task.tags.length > 3 && (
@@ -97,7 +156,7 @@ export function TaskCard({ task, onClick }) {
         <Group gap="xs">
           <IconCalendar size={12} />
           <Text size="xs" c="dimmed">
-            Created: {new Date(task.createdAt).toLocaleDateString()} {new Date(task.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {t('tasks.createdAt')}: {formatDate(task.createdAt)} {formatTime(task.createdAt)}
           </Text>
         </Group>
       </Stack>

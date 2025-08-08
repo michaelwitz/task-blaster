@@ -72,6 +72,17 @@
     "assignee": "Assignee",
     "assigneeName": "Assignee Name",
     "storyPoints": "Story Points",
+    "isBlocked": "Blocked",
+    "blockedReason": "Blocked Reason",
+    "gitFeatureBranch": "Git Feature Branch",
+    "gitPullRequestUrl": "Pull Request URL",
+    "startedAt": "Started At",
+    "completedAt": "Completed At",
+    "gitFeatureBranchPlaceholder": "feature/task-123",
+    "gitPullRequestUrlPlaceholder": "https://github.com/user/repo/pull/123",
+    "selectAssignee": "Select assignee",
+    "unassigned": "Unassigned",
+    "blockedReasonPlaceholder": "Why is this task blocked?",
 
     "prompt": "Prompt",
     "isBlocked": "Blocked",
@@ -127,7 +138,8 @@
     "createdAt": "Created",
     "actions": "Actions",
     "noTags": "No tags found",
-    "createFirstTag": "Create your first tag to get started"
+    "createFirstTag": "Create your first tag to get started",
+    "selectOrCreate": "Select or create tags"
   },
   "forms": {
     "required": "This field is required",

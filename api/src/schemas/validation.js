@@ -3,17 +3,33 @@
  * Uses Fastify's built-in AJV for maximum performance
  */
 
-// Tag name validation - enforces lowercase, hyphen rules at API level
-const tagNamePattern = '^[a-z0-9]+(-[a-z0-9]+)*$';
-
-// Common ID parameter schema
+// Common parameter schemas
 const idParam = {
   type: 'object',
+  required: ['id'],
   properties: {
-    id: { type: 'string', pattern: '^[0-9]+$' }
-  },
-  required: ['id']
+    id: { type: 'string', pattern: '^\\d+$' }
+  }
 };
+
+const codeParam = {
+  type: 'object',
+  required: ['code'],
+  properties: {
+    code: { type: 'string', pattern: '^[A-Z0-9]+$' } // Project code like PROJ, FEATURE
+  }
+};
+
+const taskIdParam = {
+  type: 'object',
+  required: ['taskId'],
+  properties: {
+    taskId: { type: 'string' } // task_id format: PROJECT-001
+  }
+};
+
+// Tag name validation - enforces lowercase, hyphen rules at API level
+const tagNamePattern = '^[a-z0-9]+(-[a-z0-9]+)*$';
 
 // Tag schemas
 export const tagSchemas = {
@@ -136,11 +152,19 @@ export const taskSchemas = {
         description: { type: 'string', maxLength: 5000 },
         status: { type: 'string', enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] },
         priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] },
-        dueDate: { type: 'string', format: 'date-time', nullable: true },
+        storyPoints: { type: 'integer', minimum: 1, maximum: 21, nullable: true },
         assigneeId: { type: 'integer', minimum: 1, nullable: true },
+        prompt: { type: 'string', maxLength: 10000 },
+        isBlocked: { type: 'boolean' },
+        blockedReason: { type: 'string', maxLength: 1000 },
+        gitFeatureBranch: { type: 'string', maxLength: 255 },
+        gitPullRequestUrl: { type: 'string', maxLength: 500 },
         position: { type: 'integer', minimum: 0 },
-        git_feature_branch: { type: 'string', maxLength: 255 },
-        git_pull_request_url: { type: 'string', maxLength: 500 }
+        tagNames: {
+          type: 'array',
+          items: { type: 'string', pattern: tagNamePattern },
+          uniqueItems: true
+        }
       },
       additionalProperties: false
     }
@@ -256,6 +280,69 @@ export const projectSchemas = {
         priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] }
       }
     }
+  },
+
+  // Project code-based task schemas
+  // PATCH /projects/:code/tasks/:taskId/status
+  updateTaskStatus: {
+    params: {
+      type: 'object',
+      required: ['code', 'taskId'],
+      properties: {
+        code: { type: 'string', pattern: '^[A-Z0-9]+$' },
+        taskId: { type: 'string' }
+      }
+    },
+    body: {
+      type: 'object',
+      required: ['status'],
+      properties: {
+        status: { 
+          type: 'string', 
+          enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] 
+        }
+      }
+    }
+  },
+
+  // PUT /projects/:code/tasks/:taskId
+  updateTask: {
+    params: {
+      type: 'object',
+      required: ['code', 'taskId'],
+      properties: {
+        code: { type: 'string', pattern: '^[A-Z0-9]+$' },
+        taskId: { type: 'string' }
+      }
+    },
+    body: {
+      type: 'object',
+      properties: {
+        title: { type: 'string' },
+        status: { type: 'string', enum: ['TO_DO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'] },
+        priority: { type: 'string', enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'] },
+        storyPoints: { type: 'number' },
+        assigneeId: { type: 'number' },
+        prompt: { type: 'string' },
+        isBlocked: { type: 'boolean' },
+        blockedReason: { type: 'string' },
+        gitFeatureBranch: { type: 'string' },
+        gitPullRequestUrl: { type: 'string' },
+        tagNames: { type: 'array', items: { type: 'string' } }
+      }
+    }
+  },
+
+  // DELETE /projects/:code/tasks/:taskId
+  deleteTask: {
+    params: {
+      type: 'object',
+      required: ['code', 'taskId'],
+      properties: {
+        code: { type: 'string', pattern: '^[A-Z0-9]+$' },
+        taskId: { type: 'string' }
+      }
+    }
   }
 };
 
@@ -331,3 +418,4 @@ export const responseSchemas = {
     }
   }
 };
+

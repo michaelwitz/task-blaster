@@ -32,7 +32,8 @@ const start = async () => {
     // Register CORS
     await app.register(cors, {
       origin: ['http://localhost:3001', 'http://127.0.0.1:3001'],
-      credentials: true
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
     });
 
     // Initialize token service before starting server
