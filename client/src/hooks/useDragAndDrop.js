@@ -1,0 +1,90 @@
+import { useCallback } from 'react';
+
+export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selectedProject }) {
+  const handleDragEnd = useCallback(async (event) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    const activeTask = tasks.find(task => task.id === active.id);
+    if (!activeTask) {
+      return;
+    }
+
+    // Determine target column
+    const overTask = tasks.find(task => task.id === over.id);
+    const targetColumn = overTask ? overTask.status : over.id;
+
+    try {
+      const token = localStorage.getItem('TB_TOKEN');
+      if (!token) {
+        console.error('No access token found');
+        return;
+      }
+
+      // If same status, we're reordering within the column
+      if (activeTask.status === targetColumn) {
+        console.log(`Reordering task ${active.id} within column ${targetColumn}`);
+        
+        const columnTasks = getTasksByStatus(targetColumn);
+        const currentIndex = columnTasks.findIndex(t => t.id === active.id);
+        const overIndex = columnTasks.findIndex(t => t.id === over.id);
+        
+        // Create new order with dragged task at target position
+        const newOrder = [...columnTasks];
+        const draggedTask = newOrder.splice(currentIndex, 1)[0];
+        newOrder.splice(overIndex, 0, draggedTask);
+        
+        // Assign new positions with 10-unit gaps
+        const positionUpdates = newOrder.map((task, index) => ({
+          taskId: task.id,
+          newPosition: (index + 1) * 10
+        }));
+        
+        const response = await fetch(`http://localhost:3030/projects/${selectedProject.id}/kanban/tasks/column/${targetColumn}/positions`, {
+          method: 'PATCH',
+          headers: {
+            'TB_TOKEN': token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ positionUpdates })
+        });
+
+        if (response.ok) {
+          console.log(`Task ${active.id} reordered in ${targetColumn}`);
+          await refreshTasks();
+        } else {
+          console.error('Failed to reorder task');
+        }
+      } else {
+        // Different status - moving between columns
+        console.log(`Moving task ${active.id} from ${activeTask.status} to ${targetColumn}`);
+        
+        const response = await fetch(`http://localhost:3030/tasks/${active.id}`, {
+          method: 'PUT',
+          headers: {
+            'TB_TOKEN': token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            ...activeTask,
+            status: targetColumn
+          })
+        });
+
+        if (response.ok) {
+          console.log(`Task ${active.id} moved to ${targetColumn}`);
+          await refreshTasks();
+        } else {
+          console.error('Failed to move task');
+        }
+      }
+    } catch (error) {
+      console.error('Error moving task:', error);
+    }
+  }, [tasks, getTasksByStatus, refreshTasks, selectedProject]);
+
+  return { handleDragEnd };
+}

@@ -2,7 +2,7 @@ import { Card, Stack, Text, Flex, Badge, Group, Box, ActionIcon } from '@mantine
 import { IconUser, IconCalendar, IconFlame, IconArrowUp, IconSquare, IconArrowDown, IconEdit, IconLock } from '@tabler/icons-react';
 import { useTranslation } from '../hooks/useTranslation.js';
 
-export function TaskCard({ task, onEdit, onMove }) {
+export function TaskCard({ task, onEdit }) {
   const { translatePriority, t, i18n } = useTranslation();
   
   // Map language codes to proper locale codes for date formatting
@@ -61,19 +61,12 @@ export function TaskCard({ task, onEdit, onMove }) {
     onEdit && onEdit(task);
   };
 
-  const handleDragStart = (e) => {
-    e.dataTransfer.setData('text/plain', task.id.toString());
-    e.dataTransfer.effectAllowed = 'move';
-  };
-
   return (
     <Card 
       shadow="sm" 
       padding="sm" 
       mb="xs" 
       withBorder
-      draggable
-      onDragStart={handleDragStart}
       style={{ 
         position: 'relative',
         opacity: 1,
