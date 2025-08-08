@@ -214,8 +214,8 @@ function AppContent() {
       <AppShell padding={0}>
         {/* Header with hamburger menu and theme toggle */}
         <AppShell.Header p="md">
-          <Flex justify="space-between" align="center">
-            <Group>
+          <Flex justify="space-between" align="center" style={{ position: 'relative' }}>
+            <Group style={{ flexShrink: 0 }}>
               <Menu shadow="md" width={200}>
                 <Menu.Target>
                   <ActionIcon variant="subtle" size="lg">
@@ -260,24 +260,34 @@ function AppContent() {
               )}
             </Group>
             
-            {/* Project title in center */}
+            {/* Project title in center - responsive layout */}
             {isKanbanPage && selectedProject && (
-              <Text 
-                size="xl" 
-                fw={600} 
-                c="blue.4"
-                style={{ 
-                  position: 'absolute', 
-                  left: '50%', 
-                  transform: 'translateX(-50%)',
-                  pointerEvents: 'none'
-                }}
-              >
-                {selectedProject.title}
-              </Text>
+              <div style={{
+                position: 'absolute',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                maxWidth: 'calc(100% - 400px)', // Leave space for left and right groups
+                overflow: 'hidden',
+                textAlign: 'center',
+                pointerEvents: 'none'
+              }}>
+                <Text 
+                  size="xl" 
+                  fw={600} 
+                  c="blue.4"
+                  style={{
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    overflow: 'hidden'
+                  }}
+                  title={selectedProject.title} // Show full title on hover
+                >
+                  {selectedProject.title}
+                </Text>
+              </div>
             )}
             
-            <Group>
+            <Group style={{ flexShrink: 0 }}>
               <IconDashboard size={24} stroke={1.5} />
               <Text size="lg" fw={700}>Task Blaster</Text>
               <ActionIcon 
@@ -293,7 +303,7 @@ function AppContent() {
         </AppShell.Header>
 
         {/* Main content */}
-        <AppShell.Main>
+        <AppShell.Main pt="md">
           <Routes>
             <Route path="/" element={
               <Navigate to="/projects" replace />
