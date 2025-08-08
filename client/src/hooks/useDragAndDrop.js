@@ -37,7 +37,7 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
 
       // If same status, we're reordering within the column
       if (activeTask.status === targetColumn) {
-        console.log(`Reordering task ${active.id} within column ${targetColumn}`);
+        console.log(`Reordering task ${activeTask.taskId} within column ${targetColumn}`);
         
         const columnTasks = getTasksByStatus(targetColumn);
         const currentIndex = columnTasks.findIndex(t => t.id === active.id);
@@ -62,7 +62,7 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
           newPosition: (index + 1) * 10
         }));
         
-        const response = await fetch(`http://localhost:3030/projects/${selectedProject.id}/kanban/tasks/column/${targetColumn}/positions`, {
+        const response = await fetch(`http://localhost:3030/projects/${selectedProject.code}/kanban/tasks/column/${targetColumn}/positions`, {
           method: 'PATCH',
           headers: {
             'TB_TOKEN': token,
@@ -72,17 +72,17 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
         });
 
         if (response.ok) {
-          console.log(`Task ${active.id} reordered in ${targetColumn}`);
+          console.log(`Task ${activeTask.taskId} reordered in ${targetColumn}`);
           await refreshTasks();
         } else {
           console.error('Failed to reorder task');
         }
       } else {
         // Different status - moving between columns
-        console.log(`Moving task ${active.id} from ${activeTask.status} to ${targetColumn}`);
+        console.log(`Moving task ${activeTask.taskId} from ${activeTask.status} to ${targetColumn}`);
         
-        // Use the dedicated status change API
-        const response = await fetch(`http://localhost:3030/tasks/${active.id}/status`, {
+        // Use the project-scoped status change API with taskId
+        const response = await fetch(`http://localhost:3030/projects/${selectedProject.code}/tasks/${activeTask.taskId}/status`, {
           method: 'PATCH',
           headers: {
             'TB_TOKEN': token,
@@ -94,7 +94,7 @@ export function useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selected
         });
 
         if (response.ok) {
-          console.log(`Task ${active.id} moved to ${targetColumn}`);
+          console.log(`Task ${activeTask.taskId} moved to ${targetColumn}`);
           await refreshTasks();
         } else {
           console.error('Failed to move task');

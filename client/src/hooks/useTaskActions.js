@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-export function useTaskActions({ refreshTasks, openModal, closeModal, updateModalTask }) {
+export function useTaskActions({ refreshTasks, openModal, closeModal, updateModalTask, selectedProject }) {
   const handleTaskEdit = useCallback((task) => {
     const modalId = `edit-${task.id}`;
     openModal(modalId, task);
@@ -12,14 +12,14 @@ export function useTaskActions({ refreshTasks, openModal, closeModal, updateModa
 
   const handleTaskSave = useCallback(async (modalId, updatedTask) => {
     try {
-      // Make API call to save task
+      // Make API call to save task using project-scoped endpoint
       const token = localStorage.getItem('TB_TOKEN');
       if (!token) {
         console.error('No access token found');
         return;
       }
 
-      const response = await fetch(`http://localhost:3030/tasks/${updatedTask.id}`, {
+      const response = await fetch(`http://localhost:3030/projects/${selectedProject.code}/tasks/${updatedTask.taskId}`, {
         method: 'PUT',
         headers: {
           'TB_TOKEN': token,
@@ -61,7 +61,7 @@ export function useTaskActions({ refreshTasks, openModal, closeModal, updateModa
     } catch (error) {
       console.error('Error saving task:', error);
     }
-  }, [refreshTasks, updateModalTask]);
+  }, [refreshTasks, updateModalTask, selectedProject]);
 
   return { handleTaskEdit, handleModalClose, handleTaskSave };
 }

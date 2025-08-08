@@ -22,7 +22,7 @@ export function KanbanPage({ selectedProject, onBackToProjects }) {
   const { openModals, openModal, closeModal, updateModalTask } = useModalManager();
   const { handleDragEnd } = useDragAndDrop({ tasks, getTasksByStatus, refreshTasks, selectedProject });
   const { handleTaskEdit, handleModalClose, handleTaskSave } = useTaskActions({ 
-    refreshTasks, openModal, closeModal, updateModalTask 
+    refreshTasks, openModal, closeModal, updateModalTask, selectedProject 
   });
 
   if (loading) {

@@ -118,7 +118,14 @@ export function useTasks(selectedProject) {
         return;
       }
 
-      const response = await fetch(`http://localhost:3030/tasks/${taskId}`, {
+      // Find the task to get its taskId
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) {
+        console.error('Task not found for update');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3030/projects/${selectedProject.code}/tasks/${task.taskId}`, {
         method: 'PUT',
         headers: {
           'TB_TOKEN': token,
@@ -155,7 +162,14 @@ export function useTasks(selectedProject) {
         return;
       }
 
-      const response = await fetch(`http://localhost:3030/tasks/${taskId}`, {
+      // Find the task to get its taskId
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) {
+        console.error('Task not found for deletion');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3030/projects/${selectedProject.code}/tasks/${task.taskId}`, {
         method: 'DELETE',
         headers: {
           'TB_TOKEN': token,

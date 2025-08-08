@@ -45,7 +45,7 @@ export function TaskDetailsModal({
     if (task && opened) {
       setEditedTask({
         ...task,
-        tags: task.tags && Array.isArray(task.tags) ? task.tags.map(tag => tag?.tag || '').filter(Boolean) : [],
+        tags: task.tags && Array.isArray(task.tags) ? task.tags.map(tag => tag?.tag || tag).filter(Boolean) : [],
         isBlocked: Boolean(task.isBlocked),
         blockedReason: task.blockedReason || '',
         gitFeatureBranch: task.gitFeatureBranch || '',
@@ -66,9 +66,15 @@ export function TaskDetailsModal({
 
   const handleSave = () => {
     if (onSave && editedTask) {
+      // Validate that blocked reason is provided when task is blocked
+      if (editedTask.isBlocked && (!editedTask.blockedReason || editedTask.blockedReason.trim() === '')) {
+        alert('Please provide a reason when marking a task as blocked.');
+        return;
+      }
+      
       const tagColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1'];
       const tagsWithColors = editedTask.tags.map((tagName, index) => ({
-        name: tagName,
+        tag: tagName,
         color: tagColors[index % tagColors.length]
       }));
       
@@ -77,13 +83,16 @@ export function TaskDetailsModal({
         tags: tagsWithColors,
         tagNames: editedTask.tags // Send tag names for API update
       });
+      
+      // Close the modal after successful save
+      onClose();
     }
   };
 
   const handleCancel = () => {
     setEditedTask({
       ...task,
-      tags: task.tags && Array.isArray(task.tags) ? task.tags.map(tag => tag?.tag || '').filter(Boolean) : []
+      tags: task.tags && Array.isArray(task.tags) ? task.tags.map(tag => tag?.tag || tag).filter(Boolean) : []
     });
   };
 
@@ -105,38 +114,46 @@ export function TaskDetailsModal({
           boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
           border: '1px solid var(--mantine-color-gray-3)',
           borderRadius: '12px',
-          overflow: 'hidden',
-          height: '80vh',
+          overflow: 'visible',
+          height: '85vh',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          position: 'relative',
+          marginTop: '35px',
+          padding: '0 0 8px 0'
         }
       }}
     >
+      {/* Task ID tab positioned relative to modal */}
+      <Box
+        style={{
+          position: 'absolute',
+          top: '-30px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          background: 'var(--mantine-color-blue-6)',
+          color: 'white',
+          padding: '6px 16px',
+          borderRadius: '8px 8px 0 0',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          zIndex: 1000,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          border: '1px solid var(--mantine-color-gray-3)',
+          borderBottom: 'none',
+          minWidth: '80px',
+          textAlign: 'center'
+        }}
+      >
+        {task.taskId}
+      </Box>
+
       <div style={{ 
         height: '100%',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        overflow: 'hidden'
       }}>
-        {/* Task ID appendage on top - centered */}
-        <Box
-          style={{
-            position: 'absolute',
-            top: '-12px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: 'var(--mantine-color-blue-6)',
-            color: 'white',
-            padding: '4px 12px',
-            borderRadius: '6px',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            zIndex: 10,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
-          }}
-        >
-          {task.taskId}
-        </Box>
-
         {/* Header with Task Title, Edit Button, and Close Button */}
         <Box
           style={{
@@ -151,7 +168,7 @@ export function TaskDetailsModal({
           }}
         >
           {/* Task Title */}
-          <Text size="lg" fw={600} style={{ flex: 1, marginTop: '8px' }}>
+          <Text size="lg" fw={600} style={{ flex: 1 }}>
             {task.title}
           </Text>
           
@@ -166,19 +183,63 @@ export function TaskDetailsModal({
           </ActionIcon>
         </Box>
 
-        {/* Modal Content */}
-        <Box p="md" style={{ flex: 1, overflowY: 'auto' }}>
+        {/* Modal Content - Scrollable */}
+        <Box 
+          p="md" 
+          style={{ 
+            flex: 1, 
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            minHeight: 0,
+            maxHeight: 'calc(85vh - 140px)'
+          }}
+        >
           <Stack gap="md">
-              {/* Title and Status on same line */}
-              <Group grow={false}>
-                <TextInput
-                  label={t('tasks.title')}
-                  placeholder={t('tasks.title')}
-                  value={editedTask?.title || ''}
-                  onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-                  required
-                  style={{ flex: 1, minWidth: '300px' }}
-                />
+              {/* Title - Full width */}
+              <TextInput
+                label={t('tasks.title')}
+                placeholder={t('tasks.title')}
+                value={editedTask?.title || ''}
+                onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                required
+              />
+              
+              {/* Status, Story Points, and Priority on same line */}
+              <Group grow={false} justify="space-between">
+                <Group grow={false}>
+                  <Select
+                    label="Points"
+                    placeholder={t('tasks.storyPoints')}
+                    data={[
+                      { value: '', label: '-' },
+                      { value: '1', label: '1' },
+                      { value: '2', label: '2' },
+                      { value: '3', label: '3' },
+                      { value: '5', label: '5' },
+                      { value: '8', label: '8' },
+                      { value: '13', label: '13' },
+                      { value: '21', label: '21' }
+                    ]}
+                    value={editedTask?.storyPoints?.toString() || ''}
+                    onChange={(value) => setEditedTask({ ...editedTask, storyPoints: value ? parseInt(value) : null })}
+                    style={{ width: '100px' }}
+                    withCheckIcon={false}
+                  />
+                  
+                  <Select
+                    label={t('tasks.priority')}
+                    data={[
+                      { value: 'LOW', label: t('tasks.priorities.LOW') },
+                      { value: 'MEDIUM', label: t('tasks.priorities.MEDIUM') },
+                      { value: 'HIGH', label: t('tasks.priorities.HIGH') },
+                      { value: 'CRITICAL', label: t('tasks.priorities.CRITICAL') }
+                    ]}
+                    value={editedTask?.priority || 'MEDIUM'}
+                    onChange={(value) => setEditedTask({ ...editedTask, priority: value })}
+                    style={{ width: '105px' }}
+                    withCheckIcon={false}
+                  />
+                </Group>
                 
                 <Select
                   label={t('tasks.status')}
@@ -191,45 +252,25 @@ export function TaskDetailsModal({
                   value={editedTask?.status || 'TO_DO'}
                   onChange={(value) => setEditedTask({ ...editedTask, status: value })}
                   maxDropdownHeight={200}
-                  style={{ minWidth: '120px', maxWidth: '150px' }}
-                />
-              </Group>
-              
-              {/* Story Points and Priority on same line */}
-              <Group grow>
-                <NumberInput
-                  label={t('tasks.storyPoints')}
-                  placeholder={t('tasks.storyPoints')}
-                  value={editedTask?.storyPoints || null}
-                  onChange={(value) => setEditedTask({ ...editedTask, storyPoints: value })}
-                  min={1}
-                  max={21}
-                />
-                
-                <Select
-                  label={t('tasks.priority')}
-                  data={[
-                    { value: 'LOW', label: t('tasks.priorities.LOW') },
-                    { value: 'MEDIUM', label: t('tasks.priorities.MEDIUM') },
-                    { value: 'HIGH', label: t('tasks.priorities.HIGH') },
-                    { value: 'CRITICAL', label: t('tasks.priorities.CRITICAL') }
-                  ]}
-                  value={editedTask?.priority || 'MEDIUM'}
-                  onChange={(value) => setEditedTask({ ...editedTask, priority: value })}
+                  style={{ minWidth: '100px' }}
+                  withCheckIcon={false}
                 />
               </Group>
               
               {/* Tags */}
-              <MultiSelect
+              <TextInput
                 label={t('tags.title')}
-                placeholder={t('tags.selectOrCreate')}
-                data={Array.isArray(tags) ? tags.map(tag => ({ value: tag.tag, label: tag.tag })) : []}
-                value={editedTask?.tags || []}
-                onChange={(value) => setEditedTask({ ...editedTask, tags: value })}
-                searchable
-                creatable
-                getCreateLabel={(query) => `+ Create ${query}`}
-                onCreate={(query) => query}
+                placeholder={t('tags.commaSeparated')}
+                value={editedTask?.tags?.join(', ') || ''}
+                onChange={(e) => {
+                  const tagString = e.target.value;
+                  const tagArray = tagString
+                    .split(',')
+                    .map(tag => tag.trim())
+                    .filter(tag => tag.length > 0);
+                  setEditedTask({ ...editedTask, tags: tagArray });
+                }}
+                description={t('tags.commaSeparatedDescription')}
               />
               
               {/* Git Feature Branch */}
@@ -274,33 +315,35 @@ export function TaskDetailsModal({
                 clearable
               />
               
-              {/* Blocked and Blocked Reason on same line */}
+              {/* Blocked toggle and reason on same line */}
               <Group align="flex-end">
-                <Switch
-                  label={t('tasks.isBlocked')}
-                  checked={editedTask?.isBlocked || false}
-                  onChange={(e) => setEditedTask({ ...editedTask, isBlocked: e.currentTarget.checked })}
-                  leftSection={<IconLock size={16} />}
-                />
+                <Group gap="xs">
+                  <IconLock size={16} />
+                  <Switch
+                    label={t('tasks.isBlocked')}
+                    checked={editedTask?.isBlocked || false}
+                    onChange={(e) => setEditedTask({ ...editedTask, isBlocked: e.currentTarget.checked })}
+                  />
+                </Group>
                 
                 {editedTask?.isBlocked && (
                   <TextInput
-                    label={t('tasks.blockedReason')}
                     placeholder={t('tasks.blockedReasonPlaceholder')}
                     value={editedTask?.blockedReason || ''}
                     onChange={(e) => setEditedTask({ ...editedTask, blockedReason: e.target.value })}
+                    required
                     style={{ flex: 1 }}
                   />
                 )}
               </Group>
               
-              {/* Prompt at the bottom */}
+              {/* Prompt - doubled height */}
               <Textarea
                 label={t('tasks.prompt')}
                 placeholder={t('tasks.prompt')}
                 value={editedTask?.prompt || ''}
                 onChange={(e) => setEditedTask({ ...editedTask, prompt: e.target.value })}
-                rows={4}
+                rows={8}
               />
             </Stack>
         </Box>

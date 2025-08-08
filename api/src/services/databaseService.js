@@ -158,6 +158,29 @@ class DatabaseService {
   }
 
   /**
+   * Get project by code
+   */
+  async getProjectByCode(code) {
+    const [project] = await db.select({
+      id: PROJECTS.id,
+      title: PROJECTS.title,
+      code: PROJECTS.code,
+      description: PROJECTS.description,
+      leaderId: PROJECTS.leader_id,
+      leaderName: USERS.full_name,
+      leaderEmail: USERS.email,
+      createdAt: PROJECTS.created_at,
+      updatedAt: PROJECTS.updated_at
+    })
+    .from(PROJECTS)
+    .leftJoin(USERS, eq(PROJECTS.leader_id, USERS.id))
+    .where(eq(PROJECTS.code, code))
+    .limit(1);
+
+    return project || null;
+  }
+
+  /**
    * Create new project
    */
   async createProject(projectData) {
@@ -370,6 +393,45 @@ class DatabaseService {
     if (!task) return null;
 
     const tags = await this.getTagsForTask(id);
+    return { ...task, tags };
+  }
+
+  /**
+   * Get task by task_id (project code + sequence) with full details
+   */
+  async getTaskByTaskId(taskId) {
+    const [task] = await db.select({
+      id: TASKS.id,
+      taskId: TASKS.task_id,
+      title: TASKS.title,
+      status: TASKS.status,
+      priority: TASKS.priority,
+      position: TASKS.position,
+      storyPoints: TASKS.story_points,
+      projectId: TASKS.project_id,
+      projectName: PROJECTS.title,
+      assigneeId: TASKS.assignee_id,
+      assigneeName: USERS.full_name,
+      assigneeEmail: USERS.email,
+      prompt: TASKS.prompt,
+      isBlocked: TASKS.is_blocked,
+      blockedReason: TASKS.blocked_reason,
+      gitFeatureBranch: TASKS.git_feature_branch,
+      gitPullRequestUrl: TASKS.git_pull_request_url,
+      startedAt: TASKS.started_at,
+      completedAt: TASKS.completed_at,
+      createdAt: TASKS.created_at,
+      updatedAt: TASKS.updated_at
+    })
+    .from(TASKS)
+    .leftJoin(PROJECTS, eq(TASKS.project_id, PROJECTS.id))
+    .leftJoin(USERS, eq(TASKS.assignee_id, USERS.id))
+    .where(eq(TASKS.task_id, taskId))
+    .limit(1);
+
+    if (!task) return null;
+
+    const tags = await this.getTagsForTask(task.id);
     return { ...task, tags };
   }
 
