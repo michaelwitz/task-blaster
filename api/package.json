@@ -20,7 +20,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michaelwitz/task-blaster.git"
+    "url": "git+https://github.com/michaelwitz/task-blaster-oss.git"
   },
   "keywords": [
     "agentic",
@@ -29,9 +29,9 @@
   "author": "Michael Woytowitz",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/michaelwitz/task-blaster/issues"
+    "url": "https://github.com/michaelwitz/task-blaster-oss/issues"
   },
-  "homepage": "https://github.com/michaelwitz/task-blaster#readme",
+  "homepage": "https://github.com/michaelwitz/task-blaster-oss#readme",
   "dependencies": {
     "@fastify/cors": "^11.1.0",
     "@fastify/multipart": "^9.0.3",
